@@ -1,4 +1,4 @@
-# cookbook
+# Cookbook
 The way to go with a cookbook
 
 ## Content
