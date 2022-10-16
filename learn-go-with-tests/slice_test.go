@@ -68,3 +68,54 @@ func Test_sumAllTails(t *testing.T) {
 		})
 	}
 }
+
+func Test_search(t *testing.T) {
+	dict := map[string]string{
+		"test": "this is just a test",
+	}
+
+	type args struct{ word string }
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"A", args{"test"}, "this is just a test"},
+		{"B", args{"unknow"}, ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := search(dict, tt.args.word); got != tt.want {
+				t.Errorf("search() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDict_Update(t *testing.T) {
+	dict := Dict{
+		"test": "this is just a test",
+	}
+
+	type args struct {
+		word  string
+		value string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"A", args{"test", "update test"}, false},
+		{"B", args{"error", "warped error"}, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := dict.Update(tt.args.word, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Dict.Update() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
