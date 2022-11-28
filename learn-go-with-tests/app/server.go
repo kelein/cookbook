@@ -33,14 +33,14 @@ type Player struct {
 type PlayerStore interface {
 	GetPlayerScore(name string) int
 	RecordWinPlayer(name string)
-	GetLeague() []Player
+	GetLeague() League
 }
 
 // StubPlayerStore store player score with map
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
-	league   []Player
+	league   League
 }
 
 // GetPlayerScore get player score by name
@@ -54,13 +54,18 @@ func (s *StubPlayerStore) RecordWinPlayer(name string) {
 }
 
 // GetLeague return player's league
-func (s *StubPlayerStore) GetLeague() []Player {
+func (s *StubPlayerStore) GetLeague() League {
 	return s.league
 }
 
 // MemoryPlayerStore store player score in memory
 type MemoryPlayerStore struct {
 	store map[string]int
+}
+
+// NewMemoryPlayerStore create a MemoryPlayerStore instance
+func NewMemoryPlayerStore() *MemoryPlayerStore {
+	return &MemoryPlayerStore{map[string]int{}}
 }
 
 // GetPlayerScore get player score by name
