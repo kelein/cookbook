@@ -2,24 +2,75 @@ package app
 
 import (
 	"encoding/json"
-	"io"
+	"os"
+
+	"github.com/pkg/errors"
 )
+
+type tape struct {
+	// file io.ReadWriteSeeker
+	file *os.File
+}
+
+func (t *tape) Write(p []byte) (int, error) {
+	t.file.Truncate(0)
+	t.file.Seek(0, 0)
+	return t.file.Write(p)
+}
+
+func (t *tape) Seek(offset int64, whence int) (int64, error) {
+	return t.file.Seek(offset, whence)
+}
 
 // FileSystemPlayerStore with file system
 type FileSystemPlayerStore struct {
 	// database io.Reader
-	database io.ReadWriteSeeker
+	// database io.Writer
+	// database io.ReadWriteSeeker
+
+	database *tape
 	league   League
 }
 
 // NewFileSystemPlayerStore create a FileSystemPlayerStore instance
-func NewFileSystemPlayerStore(db io.ReadWriteSeeker) *FileSystemPlayerStore {
-	db.Seek(0, 0)
-	league, _ := NewLeague(db)
-	return &FileSystemPlayerStore{
-		database: db,
-		league:   league,
+// func NewFileSystemPlayerStore(db io.ReadWriteSeeker) *FileSystemPlayerStore {
+// 	db.Seek(0, 0)
+// 	league, _ := NewLeague(db)
+// 	return &FileSystemPlayerStore{
+// 		// database: db,
+// 		database: &tape{db},
+// 		league:   league,
+// 	}
+// }
+
+// NewFileSystemPlayerStore create a FileSystemPlayerStore instance
+func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
+	if err := initStoreFile(file); err != nil {
+		return nil, errors.Wrap(err, "init store file failed")
 	}
+
+	league, err := NewLeague(file)
+	if err != nil {
+		return nil, errors.Wrap(err, "load league from file failed")
+	}
+
+	return &FileSystemPlayerStore{
+		database: &tape{file},
+		league:   league,
+	}, nil
+}
+
+func initStoreFile(f *os.File) error {
+	f.Seek(0, 0)
+	info, err := f.Stat()
+	if err != nil {
+		return errors.Wrap(err, "get file info failed")
+	}
+	if info.Size() == 0 {
+		f.Write([]byte("[]"))
+		f.Seek(0, 0)
+	}
+	return nil
 }
 
 // GetLeague return player's league from FileSystemStore
