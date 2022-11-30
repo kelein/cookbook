@@ -142,25 +142,37 @@ func (p *PlayerServer) register() *http.ServeMux {
 
 func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
 	log.Printf("showScore() of player %q", player)
-	score := p.store.GetPlayerScore(player)
-	if score == 0 {
-		w.WriteHeader(http.StatusNotFound)
+	// score := p.store.GetPlayerScore(player)
+	// if score == 0 {
+	// 	w.WriteHeader(http.StatusNotFound)
+	// }
+	// fmt.Fprint(w, score)
+
+	foundPlayer := p.store.GetLeague().Find(player)
+	if foundPlayer == nil {
+		p.JSON(w, http.StatusNotFound, map[string]any{
+			"code": http.StatusNotFound,
+			"msg":  fmt.Sprintf("player not found: %s", player),
+		})
+		return
 	}
-	fmt.Fprint(w, score)
+	p.JSON(w, http.StatusOK, foundPlayer)
 }
 
 func (p *PlayerServer) processWin(w http.ResponseWriter, player string) {
 	log.Printf("processWin() of player %q", player)
 	p.store.RecordWinPlayer(player)
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, http.StatusText(http.StatusOK))
+	// w.WriteHeader(http.StatusOK)
+	// fmt.Fprint(w, http.StatusText(http.StatusOK))
+	p.JSON(w, http.StatusOK, p.store.GetLeague().Find(player))
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("request of leagueHandler processing ...")
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(p.store.GetLeague())
+	// w.Header().Set("content-type", "application/json")
+	// w.WriteHeader(http.StatusOK)
+	// json.NewEncoder(w).Encode(p.store.GetLeague())
+	p.JSON(w, http.StatusOK, p.store.GetLeague())
 }
 
 func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
@@ -172,5 +184,14 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 		p.showScore(w, player)
 	case http.MethodPost:
 		p.processWin(w, player)
+	}
+}
+
+// JSON write json fomat response to the player server
+func (p *PlayerServer) JSON(w http.ResponseWriter, code int, data any) {
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(code)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

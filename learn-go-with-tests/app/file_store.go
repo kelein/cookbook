@@ -2,7 +2,9 @@ package app
 
 import (
 	"encoding/json"
+	"log"
 	"os"
+	"sort"
 
 	"github.com/pkg/errors"
 )
@@ -28,7 +30,8 @@ type FileSystemPlayerStore struct {
 	// database io.Writer
 	// database io.ReadWriteSeeker
 
-	database *tape
+	// database *tape
+	database *json.Encoder
 	league   League
 }
 
@@ -55,7 +58,7 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 	}
 
 	return &FileSystemPlayerStore{
-		database: &tape{file},
+		database: json.NewEncoder(&tape{file}),
 		league:   league,
 	}, nil
 }
@@ -98,6 +101,9 @@ func initStoreFile(f *os.File) error {
 
 // GetLeague return player's league from FileSystemStore
 func (f *FileSystemPlayerStore) GetLeague() League {
+	sort.Slice(f.league, func(i, j int) bool {
+		return f.league[i].Wins > f.league[j].Wins
+	})
 	return f.league
 }
 
@@ -132,13 +138,26 @@ func (f *FileSystemPlayerStore) GetPlayerScore(name string) int {
 // RecordWinPlayer records player who has won
 func (f *FileSystemPlayerStore) RecordWinPlayer(name string) {
 	player := f.league.Find(name)
-	if player == nil {
-		newPlayer := Player{Name: name, Wins: 1}
-		f.league = append(f.league, newPlayer)
-	} else {
+	log.Printf("RecordWinPlayer() find player result: %+v", player)
+
+	// if player == nil {
+	// 	newPlayer := Player{Name: name, Wins: 1}
+	// 	f.league = append(f.league, newPlayer)
+	// } else {
+	// 	player.Wins++
+	// }
+	if player != nil {
 		player.Wins++
+		log.Printf("current winner: %+v", player)
+	} else {
+		p := Player{Name: name, Wins: 1}
+		f.league = append(f.league, &p)
+		log.Printf("new winner joined league!")
 	}
 
-	f.database.Seek(0, 0)
-	json.NewEncoder(f.database).Encode(f.league)
+	log.Printf("RecordWinPlayer() current league: %+v", f.league)
+
+	// f.database.Seek(0, 0)
+	// json.NewEncoder(f.database).Encode(f.league)
+	f.database.Encode(f.league)
 }
