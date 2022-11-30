@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"cookbook/learn-go-with-tests/app"
 )
@@ -19,12 +18,12 @@ func init() {
 }
 
 func main() {
-	db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
-	if err != nil {
-		log.Fatalf("open db file %q err: %v", dbFileName, err)
-	}
+	// db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
+	// if err != nil {
+	// 	log.Fatalf("open db file %q err: %v", dbFileName, err)
+	// }
 
-	store, err := app.NewFileSystemPlayerStore(db)
+	store, err := app.NewFileSystemPlayerStoreLocal(dbFileName)
 	if err != nil {
 		log.Fatalf("init store err: %v", err)
 	}

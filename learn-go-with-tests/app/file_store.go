@@ -60,6 +60,15 @@ func NewFileSystemPlayerStore(file *os.File) (*FileSystemPlayerStore, error) {
 	}, nil
 }
 
+// NewFileSystemPlayerStoreLocal create a FileSystemPlayerStore from a local file
+func NewFileSystemPlayerStoreLocal(path string) (*FileSystemPlayerStore, error) {
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return nil, errors.Wrap(err, "open store file failed")
+	}
+	return NewFileSystemPlayerStore(file)
+}
+
 func initStoreFile(f *os.File) error {
 	f.Seek(0, 0)
 	info, err := f.Stat()
