@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -108,14 +109,20 @@ type PlayerServer struct {
 // NewPlayerServer return a new PlayerServer instance
 func NewPlayerServer(store PlayerStore) *PlayerServer {
 	p := &PlayerServer{store: store}
-	p.Handler = p.register()
+	// p.Handler = p.register()
+
+	mux := http.NewServeMux()
+	mux.Handle("/league", http.HandlerFunc(p.leagueHandler))
+	mux.Handle("/players/", http.HandlerFunc(p.playersHandler))
+	p.Handler = mux
+
 	return p
 }
 
 func (p *PlayerServer) register() *http.ServeMux {
 	router := http.NewServeMux()
 	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
-	router.Handle("/players", http.HandlerFunc(p.playersHandler))
+	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
 	return router
 }
 
@@ -134,6 +141,7 @@ func (p *PlayerServer) register() *http.ServeMux {
 // }
 
 func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
+	log.Printf("showScore() of player %q", player)
 	score := p.store.GetPlayerScore(player)
 	if score == 0 {
 		w.WriteHeader(http.StatusNotFound)
@@ -142,18 +150,23 @@ func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
 }
 
 func (p *PlayerServer) processWin(w http.ResponseWriter, player string) {
+	log.Printf("processWin() of player %q", player)
 	p.store.RecordWinPlayer(player)
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, http.StatusText(http.StatusOK))
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(p.store.GetLeague())
+	log.Printf("request of leagueHandler processing ...")
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(p.store.GetLeague())
 }
 
 func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("request of playersHandler processing ...")
 	player := r.URL.Path[len("/players/"):]
+	log.Printf("playersHandler() get player %q", player)
 	switch r.Method {
 	case http.MethodGet:
 		p.showScore(w, player)
