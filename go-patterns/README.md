@@ -7,4 +7,4 @@
 ### 行为型 Behavioral
 
 - [x] 职责链模式 Chain of Responsibility
-- [ ] 观察者模式 Observer Pattern
+- [x] 观察者模式 Observer Pattern
