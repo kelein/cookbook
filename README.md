@@ -10,6 +10,8 @@ The way to go with a cookbook 🍳
 - [x] [easy-go-patterns](https://github.com/aceld/EasySJMS)
 - [ ] [concurrency-in-go](concurrency-in-go)
 - [ ] [geek-design-patterns](https://time.geekbang.org/column/article/165114)
+- [ ] [golang101](https://gfw.go101.org/)
+- [ ] [master-to-go](https://github.com/aceld/golang)
 
 ## References
 
