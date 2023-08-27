@@ -1,0 +1,62 @@
+{
+ "id": "141d4bcb-c5d7-4d1b-a83b-06577393ac6d",
+ "brand": "Dell",
+ "name": "Vostro",
+ "cpu": {
+  "brand": "AMD",
+  "name": "Ryzen 7 PRO 2700U",
+  "cores": 4,
+  "threads": 7,
+  "minGhz": 2.3339120872995958,
+  "maxGhz": 4.348471420870963
+ },
+ "ram": {
+  "value": "30",
+  "unit": "GIGABYTE"
+ },
+ "gpus": [
+  {
+   "brand": "AMD",
+   "name": "RX 590",
+   "minGhz": 2.199807452911029,
+   "maxGhz": 5.696280919948581,
+   "memory": {
+    "value": "235",
+    "unit": "GIGABYTE"
+   }
+  }
+ ],
+ "storages": [
+  {
+   "driver": "HDD",
+   "memory": {
+    "value": "717",
+    "unit": "GIGABYTE"
+   }
+  },
+  {
+   "driver": "HDD",
+   "memory": {
+    "value": "2",
+    "unit": "TERABYTE"
+   }
+  }
+ ],
+ "screen": {
+  "sizeInch": 15.064768,
+  "resolution": {
+   "width": 6030,
+   "height": 3392
+  },
+  "panel": "OLED",
+  "multitouch": false
+ },
+ "keyboard": {
+  "layout": "QWERTZ",
+  "backlit": true
+ },
+ "weightKg": 1.5021956393259877,
+ "priceUsd": 3761.7253495931045,
+ "releaseYear": 2021,
+ "updateAt": "2023-08-25T07:30:24.668515Z"
+}
