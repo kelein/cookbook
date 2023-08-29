@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
@@ -39,7 +40,6 @@ func (server *LaptopServer) CreateLaptop(
 	}
 
 	laptop := req.GetLaptop()
-	log.Printf("create laptop request id: %s", laptop.Id)
 	if len(laptop.Id) > 0 {
 		_, err := uuid.Parse(laptop.Id)
 		if err != nil {
@@ -54,8 +54,8 @@ func (server *LaptopServer) CreateLaptop(
 	}
 
 	err := server.laptopStore.Save(laptop)
-	log.Printf("laptop saved result err=%v", err)
 	if err != nil {
+		log.Printf("laptop saved result err: %v", err)
 		code := codes.Internal
 		if errors.Is(err, store.ErrAlreadyExists) {
 			code = codes.AlreadyExists
@@ -64,4 +64,29 @@ func (server *LaptopServer) CreateLaptop(
 	}
 	log.Printf("laptop saved with id: %s", laptop.Id)
 	return &repo.CreateLaptopResponse{Id: laptop.Id}, nil
+}
+
+// SearchLaptop query laptops via a stream RPC
+func (server *LaptopServer) SearchLaptop(req *repo.SearchLaptopRequest, stream repo.LaptopService_SearchLaptopServer) error {
+	filter := req.GetFilter()
+	log.Printf("search laptop request with filter: %v", filter)
+	got := func(laptop *repo.Laptop) error {
+		res := &repo.SearchLaptopResponse{Laptop: laptop}
+		if err := stream.Send(res); err != nil {
+			return fmt.Errorf("server stream error: %w", err)
+		}
+		log.Printf("search request found laptop: %s", laptop.Id)
+		return nil
+	}
+	err := server.laptopStore.Search(stream.Context(), filter, got)
+	if err != nil {
+		return status.Errorf(codes.Internal, "unexpected error: %v", err)
+	}
+	return nil
+}
+
+// UploadImage upload image file via stream RPC
+func (server *LaptopServer) UploadImage() error {
+
+	return nil
 }

@@ -7,7 +7,6 @@ option go_package = "./repo";
 import "memory.proto";
 
 message Storage {
-
     enum Driver {
         UNKNOWN = 0;
         HDD = 1;

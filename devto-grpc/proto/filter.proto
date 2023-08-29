@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./repo";
+
+import "memory.proto";
+
+message Filter {
+    double max_price_used = 1;
+    uint32 min_cpu_cores = 2;
+    double min_cpu_ghz = 3;
+    Memory min_ram = 4;
+}

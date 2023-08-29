@@ -5,7 +5,6 @@ package proto;
 option go_package = "./repo";
 
 message Memory {
-
     enum Unit {
         UNKNOWN = 0;
         BIT = 1;

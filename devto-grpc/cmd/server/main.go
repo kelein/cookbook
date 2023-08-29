@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"flag"
@@ -28,6 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("net listen on [%s] failed: %v", addr, err)
 	}
+	log.Printf("server start listen on %v", addr)
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("start server failed: %v", err)
 	}
