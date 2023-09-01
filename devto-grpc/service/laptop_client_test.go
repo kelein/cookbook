@@ -1,9 +1,13 @@
 package service
 
 import (
+	"bufio"
 	"context"
+	"fmt"
 	"io"
 	"net"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,7 +15,6 @@ import (
 
 	"cookbook/devto-grpc/convert"
 	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/service"
 	"cookbook/devto-grpc/store"
 )
 
@@ -19,10 +22,11 @@ func TestClientCreateLaptop(t *testing.T) {
 	t.Parallel()
 
 	laptopStore := store.NewMemoryLaptopStore()
-	_, addr := startTestLaptopServer(t, laptopStore)
+	imgStore := store.NewDiskImageStore("../test/imgs")
+	_, addr := startTestLaptopServer(t, laptopStore, imgStore)
 	client := newTestLaptopClient(t, addr)
 
-	laptop := service.NewLaptop()
+	laptop := NewLaptop()
 	originID := laptop.Id
 	req := &repo.CreateLaptopRequest{
 		Laptop: laptop,
@@ -49,11 +53,11 @@ func requireSameLaptop(t *testing.T, origin *repo.Laptop, target *repo.Laptop) {
 	require.Equal(t, originJSON, targetJSON)
 }
 
-func startTestLaptopServer(t *testing.T, laptopStore store.LaptopStore) (*service.LaptopServer, string) {
+func startTestLaptopServer(t *testing.T, laptopStore store.LaptopStore, imgStore store.ImageStore) (*LaptopServer, string) {
 	t.Helper()
 
 	server := grpc.NewServer()
-	svc := service.NewLaptopServer(laptopStore)
+	svc := NewLaptopServer(laptopStore, imgStore)
 	repo.RegisterLaptopServiceServer(server, svc)
 
 	lis, err := net.Listen("tcp", ":0")
@@ -74,10 +78,11 @@ func newTestLaptopClient(t *testing.T, addr string) repo.LaptopServiceClient {
 func TestClientSearchLaptop(t *testing.T) {
 	t.Parallel()
 
-	store := store.NewMemoryLaptopStore()
-	targetIds := genTestDataForSearch(t, store)
+	laptopStore := store.NewMemoryLaptopStore()
+	imgStore := store.NewDiskImageStore("../test/imgs")
+	targetIds := genTestDataForSearch(t, laptopStore)
 
-	_, addr := startTestLaptopServer(t, store)
+	_, addr := startTestLaptopServer(t, laptopStore, imgStore)
 	client := newTestLaptopClient(t, addr)
 
 	filter := &repo.Filter{
@@ -110,19 +115,19 @@ func genTestDataForSearch(t *testing.T, store store.LaptopStore) map[string]bool
 	t.Helper()
 	targetIds := make(map[string]bool)
 
-	n0 := service.NewLaptop()
+	n0 := NewLaptop()
 	n0.PriceUsd = 2500
 
-	n1 := service.NewLaptop()
+	n1 := NewLaptop()
 	n1.Cpu.Cores = 2
 
-	n2 := service.NewLaptop()
+	n2 := NewLaptop()
 	n2.Cpu.MinGhz = 2.0
 
-	n3 := service.NewLaptop()
+	n3 := NewLaptop()
 	n3.Ram = &repo.Memory{Value: 4096, Unit: repo.Memory_MEGABYTE}
 
-	n4 := service.NewLaptop()
+	n4 := NewLaptop()
 	n4.PriceUsd = 1999
 	n4.Cpu.Cores = 4
 	n4.Cpu.MinGhz = 2.5
@@ -130,7 +135,7 @@ func genTestDataForSearch(t *testing.T, store store.LaptopStore) map[string]bool
 	n4.Ram = &repo.Memory{Value: 16, Unit: repo.Memory_GIGABYTE}
 	targetIds[n4.Id] = true
 
-	n5 := service.NewLaptop()
+	n5 := NewLaptop()
 	n5.PriceUsd = 2000
 	n5.Cpu.Cores = 6
 	n5.Cpu.MinGhz = 2.8
@@ -144,4 +149,58 @@ func genTestDataForSearch(t *testing.T, store store.LaptopStore) map[string]bool
 		require.NoError(t, err)
 	}
 	return targetIds
+}
+
+func TestClientUploadImage(t *testing.T) {
+	t.Parallel()
+	folder := "../tests/imgs"
+	imgStore := store.NewDiskImageStore(folder)
+	laptopStore := store.NewMemoryLaptopStore()
+	laptop := NewLaptop()
+	err := laptopStore.Save(laptop)
+	require.NoError(t, err)
+
+	_, addr := startTestLaptopServer(t, laptopStore, imgStore)
+	t.Logf("test server addr: %q", addr)
+	client := newTestLaptopClient(t, addr)
+
+	imgPath := fmt.Sprintf("%s/laptop.png", folder)
+	f, err := os.Open(imgPath)
+	defer f.Close()
+	require.NoError(t, err)
+	stream, err := client.UploadImage(context.Background())
+	require.NoError(t, err)
+
+	imageType := filepath.Ext(imgPath)
+	req := &repo.UploadImageRequest{
+		Data: &repo.UploadImageRequest_Info{
+			Info: &repo.ImageInfo{
+				LaptopId:  laptop.GetId(),
+				ImageType: imageType,
+			},
+		},
+	}
+	err = stream.Send(req)
+	require.NoError(t, err)
+
+	reader := bufio.NewReader(f)
+	buffer := make([]byte, 1024)
+	size := 0
+	for {
+		n, err := reader.Read(buffer)
+		if err == io.EOF {
+			t.Logf("End of File: %v", f.Name())
+			break
+		}
+		require.NoError(t, err)
+		size += n
+
+		req := &repo.UploadImageRequest{
+			Data: &repo.UploadImageRequest_ChunkData{
+				ChunkData: buffer[:n],
+			},
+		}
+		err = stream.Send(req)
+		require.NoError(t, err)
+	}
 }

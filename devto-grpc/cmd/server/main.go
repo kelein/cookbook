@@ -15,12 +15,15 @@ import (
 
 var port = flag.Int("port", 0, "the server port")
 
+var imgdir = flag.String("imgdir", "./../tests/imgs", "the image store dir")
+
 func main() {
 	flag.Parse()
 
 	server := grpc.NewServer()
 	laptopStore := store.NewMemoryLaptopStore()
-	svc := service.NewLaptopServer(laptopStore)
+	imageStore := store.NewDiskImageStore(*imgdir)
+	svc := service.NewLaptopServer(laptopStore, imageStore)
 	repo.RegisterLaptopServiceServer(server, svc)
 
 	addr := fmt.Sprintf("0.0.0.0:%d", *port)

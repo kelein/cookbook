@@ -1,9 +1,11 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/google/uuid"
@@ -14,14 +16,25 @@ import (
 	"cookbook/devto-grpc/store"
 )
 
+// maxChunkSizeBytes 1MB
+const maxImageSizeBytes = 1 << 20
+
 // LaptopServer provide Laptop service
 type LaptopServer struct {
 	laptopStore store.LaptopStore
+	imageStore  store.ImageStore
+
+	// UnimplementedLaptopServiceServer must be embedded
+	// to have forward compatible implementations.
+	repo.UnimplementedLaptopServiceServer
 }
 
 // NewLaptopServer crate a new LaptopServer
-func NewLaptopServer(laptopStore store.LaptopStore) *LaptopServer {
-	return &LaptopServer{laptopStore}
+func NewLaptopServer(laptopStore store.LaptopStore, imageStore store.ImageStore) *LaptopServer {
+	return &LaptopServer{
+		laptopStore: laptopStore,
+		imageStore:  imageStore,
+	}
 }
 
 // CreateLaptop crate a laptop via unary RPC
@@ -86,7 +99,75 @@ func (server *LaptopServer) SearchLaptop(req *repo.SearchLaptopRequest, stream r
 }
 
 // UploadImage upload image file via stream RPC
-func (server *LaptopServer) UploadImage() error {
+func (server *LaptopServer) UploadImage(stream repo.LaptopService_UploadImageServer) error {
+	req, err := stream.Recv()
+	if err != nil {
+		serr := status.Errorf(codes.Unknown, "revc image failed: %v", err)
+		log.Print(serr)
+		return serr
+	}
 
+	laptopID := req.GetInfo().GetLaptopId()
+	imageType := req.GetInfo().GetImageType()
+	log.Printf("uploadImage receive laptopID: %v, imageType: %s", laptopID, imageType)
+	laptop, err := server.laptopStore.Find(laptopID)
+	if err != nil {
+		serr := status.Errorf(codes.Internal, "find laptop error: %v", err)
+		log.Print(serr)
+		return serr
+	}
+	if laptop == nil {
+		serr := status.Errorf(codes.InvalidArgument, "laptop not found: %v", err)
+		log.Print(serr)
+		return serr
+	}
+
+	imageSize := 0
+	imageData := bytes.Buffer{}
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			log.Print("stream receive End of file")
+			break
+		}
+		if err != nil {
+			serr := status.Errorf(codes.Unknown, "receive chunk data failed: %v", err)
+			log.Print(serr)
+			return serr
+		}
+
+		chunk := req.GetChunkData()
+		size := len(chunk)
+		log.Printf("received chunk data size: %d", size)
+
+		imageSize += size
+		if imageSize > maxImageSizeBytes {
+			serr := status.Errorf(codes.InvalidArgument, "chunk data exceeded max value: %v", err)
+			log.Print(serr)
+			return serr
+		}
+		if _, err := imageData.Write(chunk); err != nil {
+			serr := status.Errorf(codes.Internal, "write chunk data failed: %v", err)
+			log.Print(serr)
+			return serr
+		}
+	}
+
+	imageID, err := server.imageStore.Save(laptopID, imageType, imageData)
+	if err != nil {
+		serr := status.Errorf(codes.Internal, "store image failed: %v", err)
+		log.Print(serr)
+		return serr
+	}
+	res := &repo.UploadImageResonse{
+		Id:   imageID,
+		Size: uint32(imageSize),
+	}
+	if err := stream.SendAndClose(res); err != nil {
+		serr := status.Errorf(codes.Unknown, "send response failed: %v", err)
+		log.Print(serr)
+		return serr
+	}
+	log.Printf("saved image id: %s, size: %d", imageID, imageSize)
 	return nil
 }

@@ -65,7 +65,8 @@ func TestLaptopServer_CreateLaptop(t *testing.T) {
 			t.Parallel()
 
 			req := &repo.CreateLaptopRequest{Laptop: tt.laptop}
-			server := service.NewLaptopServer(tt.store)
+			imgStore := store.NewDiskImageStore("../tests/imgs")
+			server := service.NewLaptopServer(tt.store, imgStore)
 			res, err := server.CreateLaptop(context.Background(), req)
 			t.Logf("CreateLaptop() code=[%v], res=[%v], err=[%v]", tt.code, res, err)
 			if tt.code == codes.OK {

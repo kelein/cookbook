@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -31,21 +32,6 @@ func main() {
 	}
 	client := repo.NewLaptopServiceClient(conn)
 
-	// laptop := service.NewLaptop()
-	// req := &repo.CreateLaptopRequest{Laptop: laptop}
-	// ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	// defer cancel()
-	// res, err := client.CreateLaptop(ctx, req)
-	// if err != nil {
-	// 	state, ok := status.FromError(err)
-	// 	if ok && state.Code() == codes.AlreadyExists {
-	// 		log.Printf("laptop [%v] alreay exists", res.Id)
-	// 	} else {
-	// 		log.Fatalf("create laptop failed: %v", err)
-	// 	}
-	// }
-	// log.Printf("laptop created with id: %s", res.Id)
-
 	for i := 0; i < 50; i++ {
 		createLaptop(client)
 	}
@@ -60,6 +46,58 @@ func main() {
 		},
 	}
 	searchLoptop(client, filter)
+
+	mockUploadImage(client)
+}
+
+func mockUploadImage(client repo.LaptopServiceClient) {
+	laptop := service.NewLaptop()
+	req := &repo.CreateLaptopRequest{Laptop: laptop}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	res, err := client.CreateLaptop(ctx, req)
+	if err != nil {
+		state, ok := status.FromError(err)
+		if ok && state.Code() == codes.AlreadyExists {
+			log.Printf("laptop [%v] alreay exists", res.Id)
+		} else {
+			log.Fatalf("create laptop failed: %v", err)
+		}
+	}
+	log.Printf("laptop created with id: %s", res.Id)
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("get current dir failed: %v", err)
+	}
+	imagePath := fmt.Sprintf("%s/tests/imgs/%s.png", pwd, laptop.Id)
+	uploadLaptopImage(client, laptop.GetId(), imagePath)
+}
+
+func uploadLaptopImage(client repo.LaptopServiceClient, laptopID string, imagePath string) {
+	// f, err := os.Open(imagePath)
+	// if err != nil {
+	// 	log.Fatalf("failed open file: %v", err)
+	// }
+	// defer f.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	stream, err := client.UploadImage(ctx)
+	if err != nil {
+		log.Fatalf("upload image failed: %v", err)
+	}
+	req := &repo.UploadImageRequest{
+		Data: &repo.UploadImageRequest_Info{
+			Info: &repo.ImageInfo{
+				LaptopId:  laptopID,
+				ImageType: filepath.Ext(imagePath),
+			},
+		},
+	}
+	if err := stream.Send(req); err != nil {
+		log.Fatalf("send image info failed: %v", err)
+	}
 }
 
 func createLaptop(client repo.LaptopServiceClient) error {
