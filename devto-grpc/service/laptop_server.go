@@ -23,6 +23,7 @@ const maxImageSizeBytes = 1 << 20
 type LaptopServer struct {
 	laptopStore store.LaptopStore
 	imageStore  store.ImageStore
+	rateStore   store.RateStore
 
 	// UnimplementedLaptopServiceServer must be embedded
 	// to have forward compatible implementations.
@@ -30,10 +31,11 @@ type LaptopServer struct {
 }
 
 // NewLaptopServer crate a new LaptopServer
-func NewLaptopServer(laptopStore store.LaptopStore, imageStore store.ImageStore) *LaptopServer {
+func NewLaptopServer(laptopStore store.LaptopStore, imageStore store.ImageStore, rateStore store.RateStore) *LaptopServer {
 	return &LaptopServer{
 		laptopStore: laptopStore,
 		imageStore:  imageStore,
+		rateStore:   rateStore,
 	}
 }
 
@@ -169,5 +171,13 @@ func (server *LaptopServer) UploadImage(stream repo.LaptopService_UploadImageSer
 		return serr
 	}
 	log.Printf("saved image id: %s, size: %d", imageID, imageSize)
+	return nil
+}
+
+// RateLaptop rate laptop score via streaming
+func (server *LaptopServer) RateLaptop(stream repo.LaptopService_RateLaptopServer) error {
+	for {
+
+	}
 	return nil
 }

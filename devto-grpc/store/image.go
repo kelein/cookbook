@@ -43,7 +43,7 @@ func (d *DiskImageStore) Save(laptopID string, imageType string, imageData bytes
 		return "", fmt.Errorf("gen image uuid id failed: %w", err)
 	}
 
-	path := fmt.Sprintf("%s/%s.%s", d.folder, imageID, imageType)
+	path := fmt.Sprintf("%s/%s%s", d.folder, imageID, imageType)
 	file, err := os.Create(path)
 	if err != nil {
 		return "", fmt.Errorf("create image file error: %w", err)

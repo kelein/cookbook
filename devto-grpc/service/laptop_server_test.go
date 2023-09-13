@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/service"
 	"cookbook/devto-grpc/store"
 )
 
@@ -17,13 +16,13 @@ func TestLaptopServer_CreateLaptop(t *testing.T) {
 	t.Parallel()
 
 	/* --------- Test Data Begin ------------- */
-	laptopNoID := service.NewLaptop()
+	laptopNoID := NewLaptop()
 	laptopNoID.Id = ""
 
-	laptopBadID := service.NewLaptop()
+	laptopBadID := NewLaptop()
 	laptopBadID.Id = "x-x-x-x-x-x"
 
-	laptopDupID := service.NewLaptop()
+	laptopDupID := NewLaptop()
 	laptopDupStore := store.NewMemoryLaptopStore()
 	err := laptopDupStore.Save(laptopDupID)
 	require.Nil(t, err)
@@ -37,7 +36,7 @@ func TestLaptopServer_CreateLaptop(t *testing.T) {
 	}{
 		{
 			name:   "success_with_id",
-			laptop: service.NewLaptop(),
+			laptop: NewLaptop(),
 			code:   codes.OK,
 			store:  store.NewMemoryLaptopStore(),
 		},
@@ -66,7 +65,7 @@ func TestLaptopServer_CreateLaptop(t *testing.T) {
 
 			req := &repo.CreateLaptopRequest{Laptop: tt.laptop}
 			imgStore := store.NewDiskImageStore("../tests/imgs")
-			server := service.NewLaptopServer(tt.store, imgStore)
+			server := NewLaptopServer(tt.store, imgStore)
 			res, err := server.CreateLaptop(context.Background(), req)
 			t.Logf("CreateLaptop() code=[%v], res=[%v], err=[%v]", tt.code, res, err)
 			if tt.code == codes.OK {

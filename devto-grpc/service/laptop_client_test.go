@@ -172,6 +172,7 @@ func TestClientUploadImage(t *testing.T) {
 	require.NoError(t, err)
 
 	imageType := filepath.Ext(imgPath)
+	t.Logf("imageType: %v", imageType)
 	req := &repo.UploadImageRequest{
 		Data: &repo.UploadImageRequest_Info{
 			Info: &repo.ImageInfo{
@@ -203,4 +204,11 @@ func TestClientUploadImage(t *testing.T) {
 		err = stream.Send(req)
 		require.NoError(t, err)
 	}
+
+	res, err := stream.CloseAndRecv()
+	require.NoError(t, err)
+	require.NotZero(t, res.GetId())
+	require.EqualValues(t, size, res.GetSize())
+	savedImgPath := fmt.Sprintf("%s/%s%s", folder, res.GetId(), imageType)
+	require.FileExists(t, savedImgPath)
 }

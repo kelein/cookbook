@@ -14,6 +14,8 @@ service LaptopService {
         returns (stream SearchLaptopResponse) {};
 
     rpc UploadImage(stream UploadImageRequest) returns (UploadImageResonse) {};
+
+    rpc RateLaptop(stream RateLaptopRequest) returns (stream RateLaptopResponse) {};
 }
 
 message CreateLaptopRequest {
@@ -47,4 +49,18 @@ message UploadImageResonse {
 message ImageInfo {
     string laptop_id = 1;
     string image_type = 2;
+}
+
+
+// -------- Bidi-streaming Protobuf ------- //
+
+message RateLaptopRequest {
+    string laptop_id = 1;
+    double score = 2;
+}
+
+message RateLaptopResponse {
+    string laptop_id = 1;
+    uint32 rated_count = 2;
+    double score_average = 3;
 }
