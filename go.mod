@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.3.1
-	github.com/jedib0t/go-pretty/v6 v6.4.7
+	github.com/jedib0t/go-pretty/v6 v6.4.8
 	github.com/jinzhu/copier v0.4.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
