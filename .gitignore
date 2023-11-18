@@ -1,15 +1,31 @@
+# General
+.AppleDouble
+.LSOverride
+.DS_Store
+.Trashes
+.vscode
+.idea
+
 # Binaries for programs and plugins
+*.so
+*.dll
 *.exe
 *.exe~
+*.dylib
+*.pdf
+*.rpm
+*.swp
+*.patch
 *.dll
 *.so
 *.dylib
 
-# Test binary, built with `go test -c`
+# Test binary, build with `go test -c`
 *.test
 devto-grpc/tests/*
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Output of the go coverage tool,
+# specifically when used with LiteIDE
 *.out
 
 # Dependency directories (remove the comment below to include it)
