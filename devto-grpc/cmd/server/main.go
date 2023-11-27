@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -20,7 +21,10 @@ var imgdir = flag.String("imgdir", "./../tests/imgs", "the image store dir")
 func main() {
 	flag.Parse()
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(unaryInterceptor),
+		grpc.StreamInterceptor(streamInterceptor),
+	)
 	laptopStore := store.NewMemoryLaptopStore()
 	imageStore := store.NewDiskImageStore(*imgdir)
 	rateStore := store.NewMemoryRateStore()
@@ -36,4 +40,14 @@ func main() {
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("start server failed: %v", err)
 	}
+}
+
+func unaryInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
+	log.Printf("=> unary interceptor: %v", info.FullMethod)
+	return handler(ctx, req)
+}
+
+func streamInterceptor(server any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	log.Printf("=> stream interceptor: %v", info.FullMethod)
+	return handler(server, stream)
 }

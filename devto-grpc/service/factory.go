@@ -234,3 +234,8 @@ func NewLaptop() *repo.Laptop {
 		UpdateAt:    timestamppb.Now(),
 	}
 }
+
+// RandomLaptopScore returns a random score
+func RandomLaptopScore() float64 {
+	return float64(randInt(1, 10))
+}

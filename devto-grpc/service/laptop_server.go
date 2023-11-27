@@ -177,7 +177,62 @@ func (server *LaptopServer) UploadImage(stream repo.LaptopService_UploadImageSer
 // RateLaptop rate laptop score via streaming
 func (server *LaptopServer) RateLaptop(stream repo.LaptopService_RateLaptopServer) error {
 	for {
+		err := ctxErr(stream.Context())
+		if err != nil {
+			return err
+		}
 
+		req, err := stream.Recv()
+		if err == io.EOF {
+			log.Print("no more data")
+			break
+		}
+		if err != nil {
+			return logErr(status.Errorf(codes.Unknown, "receive stream error: %v", err))
+		}
+
+		score := req.GetScore()
+		laptopID := req.GetLaptopId()
+		log.Printf("received request id=%v, score=%v", laptopID, score)
+
+		got, err := server.laptopStore.Find(laptopID)
+		if err != nil {
+			return logErr(status.Errorf(codes.Internal, "find laptop error: %v", err))
+		}
+		if got == nil {
+			return logErr(status.Errorf(codes.NotFound, "laptop not found: %v", err))
+		}
+
+		rate, err := server.rateStore.Add(laptopID, score)
+		if err != nil {
+			return logErr(status.Errorf(codes.Internal, "rating laptop error: %v", err))
+		}
+		res := &repo.RateLaptopResponse{
+			LaptopId:     laptopID,
+			RatedCount:   rate.Count,
+			ScoreAverage: rate.Sum / float64(rate.Count),
+		}
+		if err := stream.Send(res); err != nil {
+			return logErr(status.Errorf(codes.Unknown, "send stream error: %v", err))
+		}
 	}
 	return nil
+}
+
+func ctxErr(ctx context.Context) error {
+	switch ctx.Err() {
+	case context.Canceled:
+		return logErr(status.Error(codes.Canceled, "request canceld"))
+	case context.DeadlineExceeded:
+		return logErr(status.Error(codes.DeadlineExceeded, "deadlin exceeded"))
+	default:
+		return nil
+	}
+}
+
+func logErr(err error) error {
+	if err != nil {
+		log.Print(err)
+	}
+	return err
 }

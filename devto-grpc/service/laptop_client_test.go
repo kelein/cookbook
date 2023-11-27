@@ -57,7 +57,8 @@ func startTestLaptopServer(t *testing.T, laptopStore store.LaptopStore, imgStore
 	t.Helper()
 
 	server := grpc.NewServer()
-	svc := NewLaptopServer(laptopStore, imgStore)
+	rateStore := store.NewMemoryRateStore()
+	svc := NewLaptopServer(laptopStore, imgStore, rateStore)
 	repo.RegisterLaptopServiceServer(server, svc)
 
 	lis, err := net.Listen("tcp", ":0")

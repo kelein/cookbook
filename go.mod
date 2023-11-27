@@ -3,6 +3,7 @@ module cookbook
 go 1.19
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.4.0
 	github.com/jedib0t/go-pretty/v6 v6.4.9
@@ -10,6 +11,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/crypto v0.12.0
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 )
