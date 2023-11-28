@@ -1,6 +1,7 @@
 package jwtool
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -33,6 +34,28 @@ func (m *Manager) Generate(user *model.User) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(m.secretKey))
+}
+
+// Verify parse user claims from token
+func (m *Manager) Verify(accessToken string) (*UserClaims, error) {
+	keyFunc := func(token *jwt.Token) (any, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, fmt.Errorf("unexpected token signed method")
+		}
+		return []byte(m.secretKey), nil
+	}
+
+	token, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, keyFunc)
+	if err != nil {
+		return nil, fmt.Errorf("invalid token: %w", err)
+	}
+
+	claims, ok := token.Claims.(*UserClaims)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+	return claims, nil
 }
 
 // UserClaims stands for user claim
