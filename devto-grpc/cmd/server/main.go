@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"log"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	"cookbook/devto-grpc/model"
 	"cookbook/devto-grpc/repo"
@@ -28,9 +30,15 @@ var imgdir = flag.String("imgdir", "./../tests/imgs", "the image store dir")
 func main() {
 	flag.Parse()
 
+	tlsCredentials, err := loadTLSCredentials()
+	if err != nil {
+		log.Fatalf("load TLS credentials failed: %v", err)
+	}
+
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(unaryInterceptor),
 		grpc.StreamInterceptor(streamInterceptor),
+		grpc.Creds(tlsCredentials),
 	)
 
 	// interceptor := service.NewAuthInterceptor()
@@ -94,4 +102,17 @@ func getAllowRoles() map[string][]string {
 		laptopServicePath + "UploadImage":  {"admin"},
 		laptopServicePath + "RateLaptop":   {"admin", "user"},
 	}
+}
+
+func loadTLSCredentials() (credentials.TransportCredentials, error) {
+	cert, err := tls.LoadX509KeyPair("cert/server-cert.pem", "cert/server-key.pem")
+	if err != nil {
+		return nil, err
+	}
+
+	config := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.NoClientCert,
+	}
+	return credentials.NewTLS(config), nil
 }
