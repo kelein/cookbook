@@ -6,12 +6,19 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
 
+	"cookbook/devto-grpc/model"
 	"cookbook/devto-grpc/repo"
 	"cookbook/devto-grpc/service"
 	"cookbook/devto-grpc/store"
+)
+
+const (
+	secretKey     = "secret"
+	tokenDuration = time.Minute * 15
 )
 
 var port = flag.Int("port", 0, "the server port")
@@ -25,6 +32,18 @@ func main() {
 		grpc.UnaryInterceptor(unaryInterceptor),
 		grpc.StreamInterceptor(streamInterceptor),
 	)
+
+	// interceptor := service.NewAuthInterceptor()
+	// server := grpc.NewServer(
+	// 	grpc.UnaryInterceptor(interceptor.Unary()),
+	// 	grpc.StreamInterceptor(interceptor.Stream()),
+	// )
+
+	userStore := store.NewMemoryUserStore()
+	if err := seedUser(userStore); err != nil {
+		log.Fatalf("seed user failed: %v", err)
+	}
+
 	laptopStore := store.NewMemoryLaptopStore()
 	imageStore := store.NewDiskImageStore(*imgdir)
 	rateStore := store.NewMemoryRateStore()
@@ -50,4 +69,29 @@ func unaryInterceptor(ctx context.Context, req any, info *grpc.UnaryServerInfo, 
 func streamInterceptor(server any, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
 	log.Printf("=> stream interceptor: %v", info.FullMethod)
 	return handler(server, stream)
+}
+
+func createUser(userStore store.UserStore, username, password, role string) error {
+	user, err := model.NewUser(username, password, role)
+	if err != nil {
+		return err
+	}
+	return userStore.Save(user)
+}
+
+func seedUser(userStore store.UserStore) error {
+	err := createUser(userStore, "admin1", "secret", "admin")
+	if err != nil {
+		return err
+	}
+	return createUser(userStore, "user1", "secret", "user")
+}
+
+func getAllowRoles() map[string][]string {
+	laptopServicePath := "/cookbook.laptopService/"
+	return map[string][]string{
+		laptopServicePath + "CreateLaptop": {"admin"},
+		laptopServicePath + "UploadImage":  {"admin"},
+		laptopServicePath + "RateLaptop":   {"admin", "user"},
+	}
 }

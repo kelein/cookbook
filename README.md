@@ -12,10 +12,11 @@ The way to go with a cookbook 🍳
 - [ ] [geek-design-patterns](https://time.geekbang.org/column/article/165114)
 - [ ] [golang101](https://gfw.go101.org/)
 - [ ] [master-to-go](https://github.com/aceld/golang)
-- [ ] [The complete gRPC course](https://dev.to/techschoolguru/the-complete-grpc-course-protobuf-go-java-2af6)
+- [ ] [devto-grpc](https://dev.to/techschoolguru/the-complete-grpc-course-protobuf-go-java-2af6)
 
 ## References
 
 - [Constant errors - Dave Cheney](https://dave.cheney.net/2016/04/07/constant-errors)
 - [Handle go errors gracefully](https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully)
 - [All Design Patterns in Go](https://golangbyexample.com/all-design-patterns-golang/)
+- [The complete gRPC course](https://dev.to/techschoolguru/the-complete-grpc-course-protobuf-go-java-2af6)

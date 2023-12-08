@@ -24,6 +24,13 @@ type MemoryUserStore struct {
 	users map[string]*model.User
 }
 
+// NewMemoryUserStore creates a new memory user store
+func NewMemoryUserStore() *MemoryUserStore {
+	return &MemoryUserStore{
+		users: make(map[string]*model.User),
+	}
+}
+
 // Save stores user in memory
 func (s *MemoryUserStore) Save(user *model.User) error {
 	s.mutex.Lock()
