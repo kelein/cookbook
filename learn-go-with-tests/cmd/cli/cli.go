@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"cookbook/learn-go-with-tests/app"
+	"github.com/kelein/cookbook/learn-go-with-tests/app"
 )
 
 // PlayerClient client for Player

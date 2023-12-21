@@ -12,10 +12,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"cookbook/devto-grpc/model"
-	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/service"
-	"cookbook/devto-grpc/store"
+	"github.com/kelein/cookbook/devto-grpc/model"
+	"github.com/kelein/cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/service"
+	"github.com/kelein/cookbook/devto-grpc/store"
 )
 
 const (

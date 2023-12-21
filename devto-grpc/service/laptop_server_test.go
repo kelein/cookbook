@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/store"
+	"github.com/kelein/cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/store"
 )
 
 func TestLaptopServer_CreateLaptop(t *testing.T) {

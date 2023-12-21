@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"cookbook/devto-grpc/model"
+	"github.com/kelein/cookbook/devto-grpc/model"
 )
 
 // UserStore Errors

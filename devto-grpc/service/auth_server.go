@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"cookbook/devto-grpc/pkg/jwtool"
-	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/store"
+	"github.com/kelein/cookbook/devto-grpc/pkg/jwtool"
+	"github.com/kelein/cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/store"
 )
 
 // AuthServer provide auth service

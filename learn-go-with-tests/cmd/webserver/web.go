@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"cookbook/learn-go-with-tests/app"
+	"github.com/kelein/cookbook/learn-go-with-tests/app"
 )
 
 const (

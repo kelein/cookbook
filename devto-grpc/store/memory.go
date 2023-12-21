@@ -9,7 +9,7 @@ import (
 
 	"github.com/jinzhu/copier"
 
-	"cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/repo"
 )
 
 // ErrAlreadyExists record already exists

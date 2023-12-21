@@ -2,8 +2,9 @@ package service
 
 import (
 	"context"
-	"cookbook/devto-grpc/pkg/jwtool"
 	"log"
+
+	"github.com/kelein/cookbook/devto-grpc/pkg/jwtool"
 
 	"google.golang.org/grpc"
 )

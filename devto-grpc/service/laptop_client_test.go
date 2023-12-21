@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
-	"cookbook/devto-grpc/convert"
-	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/store"
+	"github.com/kelein/cookbook/devto-grpc/convert"
+	"github.com/kelein/cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/store"
 )
 
 func TestClientCreateLaptop(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"cookbook/devto-grpc/repo"
-	"cookbook/devto-grpc/service"
+	"github.com/kelein/cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/service"
 )
 
 func TestWriteBinaryFile(t *testing.T) {

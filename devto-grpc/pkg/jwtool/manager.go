@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 
-	"cookbook/devto-grpc/model"
+	"github.com/kelein/cookbook/devto-grpc/model"
 )
 
 // Manager for JWT authentication

@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"cookbook/devto-grpc/repo"
+	"github.com/kelein/cookbook/devto-grpc/repo"
 )
 
 func init() {
