@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pbgen";
+
+service Greeter {
+    rpc Greet (GreetRequest) returns (GreetResponse) {};
+
+    rpc GreetStream(GreetRequest) returns (stream GreetResponse) {};
+
+    rpc GreetRecord(stream GreetRequest) returns (GreetResponse) {};
+}
+
+message GreetRequest {
+    string name = 1;
+}
+
+message GreetResponse {
+    string message = 1;
+}

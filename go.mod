@@ -1,8 +1,11 @@
 module github.com/kelein/cookbook
 
-go 1.20
+go 1.21
+
+toolchain go1.21.5
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.26.3
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.5.0
@@ -12,6 +15,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.17.0
+	golang.org/x/sync v0.4.0
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.31.0
 )
