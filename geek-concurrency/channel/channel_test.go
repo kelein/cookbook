@@ -32,7 +32,7 @@ func TestChanelPrint(t *testing.T) {
 	select {
 	case <-ctx.Done():
 		t.Logf("context done")
-	case <-time.After(time.Second * 30):
+	case <-time.After(time.Second * 10):
 		t.Logf("context timeout")
 	}
 }
@@ -57,7 +57,7 @@ func TestChannelPlan(t *testing.T) {
 
 	chs[0] <- struct{}{}
 	select {
-	case <-time.After(time.Second * 20):
+	case <-time.After(time.Second * 10):
 		return
 	}
 }
