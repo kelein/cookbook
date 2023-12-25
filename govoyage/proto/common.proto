@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pbgen";
+
+message Pager {
+    int64 page = 1;
+    int64 size = 2;
+    int64 total = 3;
+}

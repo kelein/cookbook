@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pbgen";
+
+import "common.proto";
+
+message Tag {
+    int64 id = 1;
+    string name = 2;
+    uint32 state = 3;
+}
+
+message GetTagsRequest {
+    string name = 1;
+    uint32  state = 2;
+}
+
+message GetTagsReply {
+    repeated Tag data = 1;
+    Pager pager = 2;
+}
+
+service TagService {
+    rpc GetTags (GetTagsRequest) returns (GetTagsReply) {};
+}
