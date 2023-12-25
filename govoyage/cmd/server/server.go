@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/kelein/cookbook/govoyage/pbgen"
 	"github.com/kelein/cookbook/govoyage/service"
@@ -43,6 +44,9 @@ func main() {
 	server := grpc.NewServer()
 	greeter := service.NewGreeterService()
 	pbgen.RegisterGreeterServer(server, greeter)
+
+	// * Registe and grpcurl can test it
+	reflection.Register(server)
 
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
