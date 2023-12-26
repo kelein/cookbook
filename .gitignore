@@ -32,3 +32,6 @@ devto-grpc/tests/*
 # vendor/
 .vscode
 .DS_Store
+
+# Ingore build binaries
+govoyage/govoyage

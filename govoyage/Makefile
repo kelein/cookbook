@@ -1,5 +1,5 @@
 gen:
-	@protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=.
+	@protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=. --grpc-gateway_out=.
 	@echo "\033[32mprotoc output files generated at: pbgen"
 	@ls -lrt pbgen | grep pb.go
 
