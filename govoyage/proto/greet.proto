@@ -4,8 +4,14 @@ package proto;
 
 option go_package = "./pbgen";
 
+import "google/api/annotations.proto";
+
 service Greeter {
-    rpc Greet (GreetRequest) returns (GreetResponse) {};
+    rpc Greet (GreetRequest) returns (GreetResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/greet"
+        };
+    };
 
     rpc GreetStream(GreetRequest) returns (stream GreetResponse) {};
 

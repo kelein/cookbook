@@ -4,6 +4,7 @@ package proto;
 
 option go_package = "./pbgen";
 
+import "google/api/annotations.proto";
 import "common.proto";
 
 message Tag {
@@ -23,5 +24,9 @@ message GetTagsReply {
 }
 
 service TagService {
-    rpc GetTags (GetTagsRequest) returns (GetTagsReply) {};
+    rpc GetTags (GetTagsRequest) returns (GetTagsReply) {
+        option (google.api.http) = {
+            get: "/api/v1/tags"
+        };
+    };
 }
