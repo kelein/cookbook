@@ -4,8 +4,16 @@ package proto;
 
 option go_package = "./pbgen";
 
+import "google/protobuf/any.proto";
+
 message Pager {
     int64 page = 1;
     int64 size = 2;
     int64 total = 3;
+}
+
+message CommonError {
+    int32 code = 1;
+    string message = 2;
+    google.protobuf.Any detail = 3;
 }

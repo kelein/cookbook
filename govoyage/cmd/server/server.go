@@ -42,8 +42,10 @@ func main() {
 	slog.Info("server start listen on", "port", *port)
 
 	server := grpc.NewServer()
+	tager := service.NewTagService()
 	greeter := service.NewGreeterService()
 	pbgen.RegisterGreeterServer(server, greeter)
+	pbgen.RegisterTagServiceServer(server, tager)
 
 	// * Registe and grpcurl can test it
 	reflection.Register(server)

@@ -7,10 +7,16 @@ import (
 
 	"github.com/kelein/cookbook/govoyage/pbgen"
 	"github.com/kelein/cookbook/govoyage/pkg/bapi"
+	"github.com/kelein/cookbook/govoyage/pkg/errcode"
 )
 
+// ErrGetTagFailed error fetching tags
+var ErrGetTagFailed = errcode.NewError(200101, "获取标签失败")
+
 // TagService provides a Tag service
-type TagService struct{}
+type TagService struct {
+	pbgen.UnimplementedTagServiceServer
+}
 
 // NewTagService creates a new TagService instance
 func NewTagService() *TagService {
@@ -22,7 +28,7 @@ func (t *TagService) GetTags(ctx context.Context, req *pbgen.GetTagsRequest) (*p
 	api := bapi.NewAPI("http://localhost:8000")
 	body, err := api.GetTags(ctx, req.GetName())
 	if err != nil {
-		return nil, err
+		return nil, errcode.RPCError(ErrGetTagFailed)
 	}
 	tags := &pbgen.GetTagsReply{}
 	if err := json.Unmarshal(body, tags); err != nil {
