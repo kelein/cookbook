@@ -149,6 +149,7 @@ func runGRPCServer() *grpc.Server {
 		grpc.ChainUnaryInterceptor(
 			middleware.LogInterceptor,
 			middleware.NopInterceptor,
+			middleware.LoggingInterceptor(),
 		),
 	}
 

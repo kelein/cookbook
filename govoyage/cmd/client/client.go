@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
-	grpcw "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
@@ -58,7 +57,7 @@ func main() {
 			insecure.NewCredentials(),
 		),
 
-		grpc.WithUnaryInterceptor(grpcw.ChainUnaryClient(
+		grpc.WithChainUnaryInterceptor(
 			// * Retry Interceptor Option
 			retry.UnaryClientInterceptor(
 				retry.WithMax(2), retry.WithCodes(
@@ -67,7 +66,7 @@ func main() {
 					codes.DeadlineExceeded,
 				),
 			),
-		)),
+		),
 	}
 
 	conn, err := grpc.Dial(*addr, opts...)
