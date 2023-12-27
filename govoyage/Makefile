@@ -1,7 +1,8 @@
 gen:
-	@protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=. --grpc-gateway_out=.
+	@protoc --proto_path=proto proto/*.proto --go_out=. --go-grpc_out=. --grpc-gateway_out=. --openapi_out=naming=json=paths=source_relative:./assets
 	@echo "\033[32mprotoc output files generated at: pbgen"
 	@ls -lrt pbgen | grep pb.go
+	@ls -lrt assets | grep yaml
 
 
 clean:
