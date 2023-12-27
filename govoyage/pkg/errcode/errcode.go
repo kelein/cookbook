@@ -57,8 +57,10 @@ func RPCError(err *Error) error {
 
 // RPCCode converts common error to RPC code
 func RPCCode(code int) codes.Code {
-	statusCode := codes.OK
+	var statusCode codes.Code
 	switch code {
+	case Success.Code():
+		statusCode = codes.OK
 	case Fail.Code():
 		statusCode = codes.Internal
 	case InvalidParams.Code():
