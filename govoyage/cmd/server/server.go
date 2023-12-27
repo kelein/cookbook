@@ -21,6 +21,7 @@ import (
 
 	"github.com/kelein/cookbook/govoyage/assets"
 	"github.com/kelein/cookbook/govoyage/pbgen"
+	"github.com/kelein/cookbook/govoyage/pkg/middleware"
 	"github.com/kelein/cookbook/govoyage/service"
 )
 
@@ -144,7 +145,14 @@ func runHTTPServer() *http.ServeMux {
 
 // runGRPCServer start a grpc server
 func runGRPCServer() *grpc.Server {
-	server := grpc.NewServer()
+	opts := []grpc.ServerOption{
+		grpc.ChainUnaryInterceptor(
+			middleware.LogInterceptor,
+			middleware.NopInterceptor,
+		),
+	}
+
+	server := grpc.NewServer(opts...)
 	tager := service.NewTagService()
 	greeter := service.NewGreeterService()
 	pbgen.RegisterGreeterServer(server, greeter)

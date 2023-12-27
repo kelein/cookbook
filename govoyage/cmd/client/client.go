@@ -11,8 +11,11 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v6"
+	grpcw "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/retry"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/kelein/cookbook/govoyage/pbgen"
@@ -49,11 +52,25 @@ func init() {
 func main() {
 	flag.Parse()
 
-	conn, err := grpc.Dial(*addr,
+	// * Client Interceptor Options
+	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(
 			insecure.NewCredentials(),
 		),
-	)
+
+		grpc.WithUnaryInterceptor(grpcw.ChainUnaryClient(
+			// * Retry Interceptor Option
+			retry.UnaryClientInterceptor(
+				retry.WithMax(2), retry.WithCodes(
+					codes.Unknown,
+					codes.Internal,
+					codes.DeadlineExceeded,
+				),
+			),
+		)),
+	}
+
+	conn, err := grpc.Dial(*addr, opts...)
 	if err != nil {
 		slog.Error("connect server failed", "error", err)
 	}
