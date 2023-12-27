@@ -12,12 +12,14 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/swaggest/swgui/v5emb"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/kelein/cookbook/govoyage/assets"
 	"github.com/kelein/cookbook/govoyage/pbgen"
 	"github.com/kelein/cookbook/govoyage/service"
 )
@@ -27,7 +29,15 @@ const (
 	contentTypeGRPC = "application/grpc"
 )
 
-var port = flag.Int("port", 8080, "server listen port")
+var (
+	port = flag.Int("port", 8080, "server listen port")
+	addr = fmt.Sprintf("0.0.0.0:%d", *port)
+)
+
+var (
+	apiDocName = "Govoyage"
+	apiDocPath = "/api/v1/docs/"
+)
 
 func init() {
 	replace := func(groups []string, a slog.Attr) slog.Attr {
@@ -44,12 +54,21 @@ func init() {
 		os.Stdout, &slog.HandlerOptions{
 			AddSource:   true,
 			ReplaceAttr: replace,
-			// Level:       slog.LevelDebug,
 		},
 	))
 	slog.SetDefault(logger)
 }
 
+func main() {
+	flag.Parse()
+	slog.Info("server start listen on", "addr", addr)
+	if err := RunMultiServer(addr); err != nil {
+		slog.Error("server start failed", "addr", addr, "error", err)
+		os.Exit(1)
+	}
+}
+
+// mainV1 test unary and stream gRPC server
 func mainV1() {
 	flag.Parse()
 	slog.Info("server start listen on", "port", *port)
@@ -70,34 +89,56 @@ func mainV1() {
 	server.Serve(listener)
 }
 
-func main() {
-	flag.Parse()
-	slog.Info("server start listen on", "port", *port)
+// mainV2 test Swagger UI embedded
+func mainV2() {
+	// * Register static OpenAPI yaml file
+	http.Handle(assets.OpenAPIFilePath, http.FileServer(http.FS(assets.OpenAPIFile)))
+	slog.Info("server openAPI file", "path", assets.OpenAPIFilePath)
 
-	if err := RunMultiServer(*port); err != nil {
-		slog.Error("server start failed", "error", err)
-		os.Exit(1)
-	}
+	// * Register swagger UI and docs
+	http.Handle(apiDocPath, v5emb.New(apiDocName, assets.OpenAPIFilePath, apiDocPath))
+	slog.Info("server openAPI docs", "path", apiDocPath)
+
+	// * Register index handler
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		writer.Write([]byte("Hello Govoyage!"))
+	})
+
+	slog.Info("server start listen on", "addr", addr)
+	http.ListenAndServe(addr, http.DefaultServeMux)
 }
 
 // RunMultiServer start both http and grpc server on the same port
-func RunMultiServer(port int) error {
-	addr := fmt.Sprintf(":%d", port)
-
-	httpMux := runHTTPServer()
+func RunMultiServer(addr string) error {
+	httpServer := runHTTPServer()
 	grpcServer := runGRPCServer()
-	gatewayMux := runGRPCGateway(port)
-
-	httpMux.Handle("/", gatewayMux)
-	return http.ListenAndServe(addr, grpcHandlerFunc(grpcServer, httpMux))
+	gatewayServer := runGRPCGateway(addr)
+	httpServer.Handle("/", gatewayServer)
+	return http.ListenAndServe(addr, grpcHandlerFunc(grpcServer, httpServer))
 }
 
 // runHTTPServer starts a http server via grpc-gateway
 func runHTTPServer() *http.ServeMux {
 	mux := http.NewServeMux()
+
+	// * Register index handler
+	mux.HandleFunc("/index", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(index))
+	})
+	slog.Info("server home index", "path", "/index")
+
+	// * Register heart beat endpoint
 	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"message": "HTTP server is running!"}`))
 	})
+
+	// * Register static OpenAPI yaml file
+	mux.Handle(assets.OpenAPIFilePath, http.FileServer(http.FS(assets.OpenAPIFile)))
+	slog.Info("server openAPI file", "path", assets.OpenAPIFilePath)
+
+	// * Register swagger UI and docs
+	mux.Handle(apiDocPath, v5emb.New(apiDocName, assets.OpenAPIFilePath, apiDocPath))
+	slog.Info("server openAPI docs", "path", apiDocPath)
 	return mux
 }
 
@@ -115,16 +156,15 @@ func runGRPCServer() *grpc.Server {
 }
 
 // runGRPCGateway start a grpc gateway server
-func runGRPCGateway(port int) *runtime.ServeMux {
-	endpoint := fmt.Sprintf(":%d", port)
+func runGRPCGateway(addr string) *runtime.ServeMux {
 	mux := runtime.NewServeMux()
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(
 			insecure.NewCredentials(),
 		),
 	}
-	pbgen.RegisterGreeterHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
-	pbgen.RegisterTagServiceHandlerFromEndpoint(context.Background(), mux, endpoint, opts)
+	pbgen.RegisterGreeterHandlerFromEndpoint(context.Background(), mux, addr, opts)
+	pbgen.RegisterTagServiceHandlerFromEndpoint(context.Background(), mux, addr, opts)
 	return mux
 }
 
@@ -139,9 +179,12 @@ func grpcHandlerFunc(grpcServer *grpc.Server, httpServer http.Handler) http.Hand
 			httpServer.ServeHTTP(w, r)
 		}
 	}
-
-	return h2c.NewHandler(
-		http.HandlerFunc(grpcFn),
-		&http2.Server{},
-	)
+	return h2c.NewHandler(http.HandlerFunc(grpcFn), &http2.Server{})
 }
+
+var index = `<!DOCTYPE html>
+<html lang="en"><body>
+<h3>Govoyage</h3>
+<li><a href="/openapi.yaml">OpenAPI Yaml</a></li>
+<li><a href="/api/v1/docs/">OpenAPI Docs<a></li>
+</body></html>`
