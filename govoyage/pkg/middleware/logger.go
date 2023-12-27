@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
@@ -12,6 +13,7 @@ import (
 func LoggingInterceptor() grpc.UnaryServerInterceptor {
 	opts := []logging.Option{
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+		logging.WithFieldsFromContext(logTraceID),
 	}
 	return logging.UnaryServerInterceptor(
 		InterceptorLogger(slog.Default()), opts...,
@@ -25,4 +27,11 @@ func InterceptorLogger(s *slog.Logger) logging.Logger {
 			s.Log(ctx, slog.Level(lvl), msg, fields...)
 		},
 	)
+}
+
+func logTraceID(ctx context.Context) logging.Fields {
+	if span := trace.SpanContextFromContext(ctx); span.IsSampled() {
+		return logging.Fields{"traceID", span.TraceID().String()}
+	}
+	return nil
 }
