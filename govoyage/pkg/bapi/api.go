@@ -7,6 +7,10 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"time"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
 )
 
 // Application Key and Secret
@@ -44,11 +48,35 @@ func (a *API) getAccessToken(ctx context.Context) (string, error) {
 }
 
 func (a *API) get(ctx context.Context, path string) ([]byte, error) {
-	resp, err := http.Get(fmt.Sprintf("%s/%s", a.URL, path))
+	url := fmt.Sprintf("%s/%s", a.URL, path)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// * Tracing Injection
+	span, newCtx := opentracing.StartSpanFromContext(
+		ctx, fmt.Sprintf("[HTTP] GET %q", a.URL),
+		opentracing.Tag{Key: string(ext.Component), Value: "HTTP"},
+	)
+	span.SetTag("url", url)
+	err = opentracing.GlobalTracer().Inject(
+		span.Context(), opentracing.HTTPHeaders,
+		opentracing.HTTPHeadersCarrier(req.Header),
+	)
+	if err != nil {
+		slog.Warn("trace inject failed", "error", err)
+	}
+
+	req = req.WithContext(newCtx)
+	client := http.Client{Timeout: time.Second * 60}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	defer span.Finish()
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err

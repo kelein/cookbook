@@ -22,6 +22,7 @@ import (
 	"github.com/kelein/cookbook/govoyage/assets"
 	"github.com/kelein/cookbook/govoyage/pbgen"
 	"github.com/kelein/cookbook/govoyage/pkg/middleware"
+	"github.com/kelein/cookbook/govoyage/pkg/tracer"
 	"github.com/kelein/cookbook/govoyage/service"
 )
 
@@ -63,6 +64,12 @@ func init() {
 func main() {
 	flag.Parse()
 	slog.Info("server start listen on", "addr", addr)
+
+	if err := tracer.Setup(); err != nil {
+		slog.Error("opentracing setup failed", "error", err)
+		os.Exit(1)
+	}
+
 	if err := RunMultiServer(addr); err != nil {
 		slog.Error("server start failed", "addr", addr, "error", err)
 		os.Exit(1)
@@ -150,6 +157,7 @@ func runGRPCServer() *grpc.Server {
 			middleware.LogInterceptor,
 			middleware.NopInterceptor,
 			middleware.LoggingInterceptor(),
+			middleware.ServerTraceInterceptor(),
 		),
 	}
 

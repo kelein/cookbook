@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/kelein/cookbook/govoyage/pbgen"
+	"github.com/kelein/cookbook/govoyage/pkg/middleware"
 )
 
 var addr = flag.String("address", ":8080", "the server address")
@@ -58,6 +59,9 @@ func main() {
 		),
 
 		grpc.WithChainUnaryInterceptor(
+			// * Tracing Interceptor Option
+			middleware.ClientTraceInterceptor(),
+
 			// * Retry Interceptor Option
 			retry.UnaryClientInterceptor(
 				retry.WithMax(2), retry.WithCodes(
