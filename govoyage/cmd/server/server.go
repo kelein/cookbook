@@ -32,8 +32,9 @@ const (
 )
 
 var (
-	port = flag.Int("port", 8080, "server listen port")
-	addr = fmt.Sprintf("0.0.0.0:%d", *port)
+	traceUIPort = flag.Int("trace-ui-port", 8090, "trace collector UI port")
+	port        = flag.Int("port", 8080, "server listen port")
+	addr        = fmt.Sprintf("0.0.0.0:%d", *port)
 )
 
 var (
@@ -65,8 +66,18 @@ func main() {
 	flag.Parse()
 	slog.Info("server start listen on", "addr", addr)
 
-	if err := tracer.Setup(); err != nil {
+	if err := tracer.SetupTracer(); err != nil {
 		slog.Error("opentracing setup failed", "error", err)
+		os.Exit(1)
+	}
+
+	if err := tracer.SetupCollectorServer(); err != nil {
+		slog.Error("jaeger collector setup failed", "error", err)
+		os.Exit(1)
+	}
+
+	if err := tracer.SetupCollectorUI(*traceUIPort); err != nil {
+		slog.Error("jaeger collector UI setup failed", "error", err)
 		os.Exit(1)
 	}
 
