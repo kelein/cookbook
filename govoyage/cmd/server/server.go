@@ -66,15 +66,17 @@ func main() {
 	flag.Parse()
 	slog.Info("server start listen on", "addr", addr)
 
-	if err := tracer.SetupTracer(); err != nil {
-		slog.Error("opentracing setup failed", "error", err)
-		os.Exit(1)
-	}
+	// if err := tracer.SetupTracer(); err != nil {
+	// 	slog.Error("opentracing setup failed", "error", err)
+	// 	os.Exit(1)
+	// }
 
-	if err := tracer.SetupCollectorServer(); err != nil {
+	collectorAddr, err := tracer.SetupCollectorServer()
+	if err != nil {
 		slog.Error("jaeger collector setup failed", "error", err)
 		os.Exit(1)
 	}
+	tracer.SetTracerWithCollector(collectorAddr)
 
 	if err := tracer.SetupCollectorUI(*traceUIPort); err != nil {
 		slog.Error("jaeger collector UI setup failed", "error", err)

@@ -12,6 +12,7 @@ import (
 	"github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/config"
 	"sourcegraph.com/sourcegraph/appdash"
+	apptracing "sourcegraph.com/sourcegraph/appdash/opentracing"
 	"sourcegraph.com/sourcegraph/appdash/traceapp"
 )
 
@@ -36,12 +37,19 @@ func SetupTracer() error {
 	return err
 }
 
+// SetTracerWithCollector sets up the tracing system with appdash collector
+func SetTracerWithCollector(addr string) {
+	collector := appdash.NewRemoteCollector(addr)
+	tr := apptracing.NewTracer(collector)
+	opentracing.SetGlobalTracer(tr)
+}
+
 // SetupCollectorServer sets up the Jaeger collector
-func SetupCollectorServer() error {
+func SetupCollectorServer() (string, error) {
 	listener, err := net.ListenTCP("tcp", &net.TCPAddr{IP: net.IPv4(0, 0, 0, 0)})
 	if err != nil {
 		slog.Error("trace collector listener failed", "error", err)
-		return err
+		return "", err
 	}
 	addr := fmt.Sprintf("0.0.0.0:%d", listener.Addr().(*net.TCPAddr).Port)
 	slog.Info("trace collector listen on", "addr", addr)
@@ -49,7 +57,7 @@ func SetupCollectorServer() error {
 	// store := appdash.NewMemoryStore()
 	server := appdash.NewServer(listener, appdash.NewLocalCollector(STORE))
 	go server.Start()
-	return nil
+	return addr, nil
 }
 
 // SetupCollectorUI sets up the Jaeger collector UI
