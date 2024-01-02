@@ -168,7 +168,7 @@ func registerService(addr string) error {
 		slog.Error("initial zap logger failed", "error", err)
 		return err
 	}
-	prefix := fmt.Sprintf("/registry/service/%s", serviceName)
+	prefix := fmt.Sprintf("/etcdv3://registry/service/grpc/%s", serviceName)
 	grpcproxy.Register(logger, etcdcli, prefix, addr, 60)
 	return nil
 }

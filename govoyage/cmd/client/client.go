@@ -91,6 +91,26 @@ func main() {
 	mockGreetRecord(client, &pbgen.GreetRequest{Name: gofakeit.Name()})
 }
 
+// func getClientConn(ctx context.Context, serviceName string, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+// 	config := clientv3.Config{
+// 		Endpoints:   []string{"http://localhost"},
+// 		DialTimeout: time.Second * 60,
+// 	}
+
+// 	etcdcli, err := clientv3.New(config)
+// 	if err != nil {
+// 		slog.Error("connect etcd failed", "error", err)
+// 		return nil, err
+// 	}
+// 	target := fmt.Sprintf("/etcdv3://registry/service/Govoyage/%s", serviceName)
+// 	r := &naming.GRPCResolver{Client: etcdcli}
+// 	opts = append(opts, grpc.WithBlock(),
+// 		grpc.WithResolvers(r),
+// 		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy":"round_robin"}`),
+// 	)
+// 	return grpc.DialContext(ctx, target, opts...)
+// }
+
 // mockGreetRecord mock client stream request
 func mockGreetRecord(client pbgen.GreeterClient, req *pbgen.GreetRequest) error {
 	stream, err := client.GreetRecord(context.Background())
