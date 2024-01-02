@@ -3,7 +3,7 @@ package convert
 import (
 	"testing"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/kelein/cookbook/devto-grpc/repo"
 	"github.com/kelein/cookbook/devto-grpc/service"

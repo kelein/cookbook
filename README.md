@@ -20,3 +20,4 @@ The way to go with a cookbook 🍳
 - [Handle go errors gracefully](https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully)
 - [All Design Patterns in Go](https://golangbyexample.com/all-design-patterns-golang/)
 - [The complete gRPC course](https://dev.to/techschoolguru/the-complete-grpc-course-protobuf-go-java-2af6)
+- [Distributed Tracing in 10 Minutes](https://medium.com/opentracing/distributed-tracing-in-10-minutes-51b378ee40f1#.ypcuah408)

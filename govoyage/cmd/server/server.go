@@ -10,9 +10,13 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/swaggest/swgui/v5emb"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/server/v3/proxy/grpcproxy"
+	"go.uber.org/zap"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -32,14 +36,16 @@ const (
 )
 
 var (
-	traceUIPort = flag.Int("trace-ui-port", 8090, "trace collector UI port")
 	port        = flag.Int("port", 8080, "server listen port")
-	addr        = fmt.Sprintf("0.0.0.0:%d", *port)
+	etcdAddr    = flag.String("etcd-addr", "127.0.0.1:2379", "etcd server address")
+	traceUIPort = flag.Int("trace-ui-port", 8090, "trace collector UI port")
+	serverAddr  = fmt.Sprintf("0.0.0.0:%d", *port)
 )
 
 var (
-	apiDocName = "Govoyage"
-	apiDocPath = "/api/v1/docs/"
+	serviceName = "Govoyage"
+	apiDocName  = serviceName
+	apiDocPath  = "/api/v1/docs/"
 )
 
 func init() {
@@ -64,7 +70,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	slog.Info("server start listen on", "addr", addr)
+	slog.Info("server start listen on", "addr", serverAddr)
 
 	// if err := tracer.SetupTracer(); err != nil {
 	// 	slog.Error("opentracing setup failed", "error", err)
@@ -83,8 +89,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := RunMultiServer(addr); err != nil {
-		slog.Error("server start failed", "addr", addr, "error", err)
+	if err := RunMultiServer(serverAddr); err != nil {
+		slog.Error("server start failed", "addr", serverAddr, "error", err)
 		os.Exit(1)
 	}
 }
@@ -125,8 +131,8 @@ func mainV2() {
 		writer.Write([]byte("Hello Govoyage!"))
 	})
 
-	slog.Info("server start listen on", "addr", addr)
-	http.ListenAndServe(addr, http.DefaultServeMux)
+	slog.Info("server start listen on", "addr", serverAddr)
+	http.ListenAndServe(serverAddr, http.DefaultServeMux)
 }
 
 // RunMultiServer start both http and grpc server on the same port
@@ -135,7 +141,36 @@ func RunMultiServer(addr string) error {
 	grpcServer := runGRPCServer()
 	gatewayServer := runGRPCGateway(addr)
 	httpServer.Handle("/", gatewayServer)
+
+	// * Register service endpoints
+	if err := registerService(addr); err != nil {
+		slog.Error("register service failed", "error", err)
+		return err
+	}
 	return http.ListenAndServe(addr, grpcHandlerFunc(grpcServer, httpServer))
+}
+
+// registerService register the service into etcd
+func registerService(addr string) error {
+	etcdcli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{*etcdAddr},
+		DialTimeout: time.Second * 60,
+	})
+	if err != nil {
+		slog.Error("connect etcd failed", "addr", etcdAddr, "error", err)
+		return err
+	}
+	defer etcdcli.Close()
+	slog.Info("etcd client info", "endpoints", etcdcli.Endpoints())
+
+	logger, err := zap.NewProduction()
+	if err != nil {
+		slog.Error("initial zap logger failed", "error", err)
+		return err
+	}
+	prefix := fmt.Sprintf("/registry/service/%s", serviceName)
+	grpcproxy.Register(logger, etcdcli, prefix, addr, 60)
+	return nil
 }
 
 // runHTTPServer starts a http server via grpc-gateway

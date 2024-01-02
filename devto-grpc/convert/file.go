@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 // WriteBinaryFile writes protobuf into binary file
@@ -32,14 +32,14 @@ func ReadBinaryFile(filename string, message proto.Message) error {
 	return nil
 }
 
-// MarshalJSON convert proto message into JSON string
-func MarshalJSON(message proto.Message) (string, error) {
-	m := jsonpb.Marshaler{
-		Indent:       " ",
-		EmitDefaults: true,
-		EnumsAsInts:  false,
+// MarshalJSON convert proto message into JSON byte
+func MarshalJSON(message proto.Message) ([]byte, error) {
+	m := protojson.MarshalOptions{
+		Indent:            " ",
+		EmitDefaultValues: true,
+		UseEnumNumbers:    false,
 	}
-	return m.MarshalToString(message)
+	return m.Marshal(message)
 }
 
 // WriteJSONFile write proto message into JSON file
@@ -48,7 +48,7 @@ func WriteJSONFile(message proto.Message, filename string) error {
 	if err != nil {
 		return fmt.Errorf("marshal proto to json error: %w", err)
 	}
-	if err := os.WriteFile(filename, []byte(data), 0644); err != nil {
+	if err := os.WriteFile(filename, data, 0644); err != nil {
 		return fmt.Errorf("write JSON byte error: %w", err)
 	}
 	return nil
