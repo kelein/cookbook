@@ -38,8 +38,8 @@ const (
 )
 
 var (
-	_           = flag.Bool("v", false, "show build version")
-	_           = flag.Bool("version", false, "show build version")
+	v           = flag.Bool("v", false, "show build version")
+	vs          = flag.Bool("version", false, "show build version")
 	port        = flag.Int("port", 8080, "server listen port")
 	etcdAddr    = flag.String("etcd-addr", "127.0.0.1:2379", "etcd server address")
 	traceUIPort = flag.Int("trace-ui-port", 8090, "trace collector UI port")
@@ -80,7 +80,8 @@ func main() {
 	showVersion()
 
 	slog.Info("server build info", "version", version.Version, "branch",
-		version.Branch, "revision", version.Revision, "user", version.BuildUser)
+		version.Branch, "revision", version.Revision, "buildUser",
+		version.BuildUser, "buildDate", version.BuildDate)
 	slog.Info("server start listen on", "addr", serverAddr)
 
 	// if err := tracer.SetupTracer(); err != nil {
@@ -266,10 +267,8 @@ var index = `<!DOCTYPE html>
 </body></html>`
 
 func showVersion() {
-	for _, arg := range os.Args {
-		if arg == "--version" || arg == "-v" {
-			fmt.Println(version.String())
-			os.Exit(0)
-		}
+	if *v || *vs {
+		fmt.Println(version.String())
+		os.Exit(0)
 	}
 }
