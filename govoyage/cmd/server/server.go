@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -195,6 +196,16 @@ func runHTTPServer() *http.ServeMux {
 	})
 	slog.Info("server home index", "path", "/index")
 
+	// * Register server runtime version info
+	mux.HandleFunc("/version", func(w http.ResponseWriter, r *http.Request) {
+		info, err := json.Marshal(version.Runtime())
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		w.Write(info)
+	})
+
 	// * Register heart beat endpoint
 	mux.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"message": "HTTP server is running!"}`))
@@ -207,6 +218,10 @@ func runHTTPServer() *http.ServeMux {
 	// * Register swagger UI and docs
 	mux.Handle(apiDocPath, v5emb.New(apiDocName, assets.OpenAPIFilePath, apiDocPath))
 	slog.Info("server openAPI docs", "path", apiDocPath)
+
+	// * Register Pprof endpoint
+	middleware.NewProfiler().Register(mux)
+
 	return mux
 }
 

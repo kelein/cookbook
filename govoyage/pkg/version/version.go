@@ -3,6 +3,7 @@ package version
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"runtime"
 	"strings"
 	"text/template"
@@ -31,6 +32,16 @@ var versionInfoTmpl = `
   go version:       {{.goVersion}}
   platform:         {{.platform}}
 `
+
+// Runtime returns server runtime information
+func Runtime() map[string]any {
+	return map[string]any{
+		"app":    AppName,
+		"pid":    os.Getpid(),
+		"build":  Info(),
+		"uptime": Uptime,
+	}
+}
 
 // Info returns version and branch information
 func Info() map[string]string {
