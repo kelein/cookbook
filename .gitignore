@@ -35,3 +35,4 @@ devto-grpc/tests/*
 
 # Ingore build binaries
 govoyage/govoyage
+govoyage/bin

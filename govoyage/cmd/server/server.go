@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/swaggest/swgui/v5emb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/server/v3/proxy/grpcproxy"
@@ -27,6 +28,7 @@ import (
 	"github.com/kelein/cookbook/govoyage/pbgen"
 	"github.com/kelein/cookbook/govoyage/pkg/middleware"
 	"github.com/kelein/cookbook/govoyage/pkg/tracer"
+	"github.com/kelein/cookbook/govoyage/pkg/version"
 	"github.com/kelein/cookbook/govoyage/service"
 )
 
@@ -36,6 +38,8 @@ const (
 )
 
 var (
+	_           = flag.Bool("v", false, "show build version")
+	_           = flag.Bool("version", false, "show build version")
 	port        = flag.Int("port", 8080, "server listen port")
 	etcdAddr    = flag.String("etcd-addr", "127.0.0.1:2379", "etcd server address")
 	traceUIPort = flag.Int("trace-ui-port", 8090, "trace collector UI port")
@@ -43,8 +47,8 @@ var (
 )
 
 var (
-	serviceName = "Govoyage"
-	apiDocName  = serviceName
+	serviceName = version.AppName
+	apiDocName  = version.AppName
 	apiDocPath  = "/api/v1/docs/"
 )
 
@@ -66,10 +70,17 @@ func init() {
 		},
 	))
 	slog.SetDefault(logger)
+
+	// * Register Prometheus Metrics Collector
+	prometheus.MustRegister(version.NewCollector(version.AppName))
 }
 
 func main() {
 	flag.Parse()
+	showVersion()
+
+	slog.Info("server build info", "version", version.Version, "branch",
+		version.Branch, "revision", version.Revision, "user", version.BuildUser)
 	slog.Info("server start listen on", "addr", serverAddr)
 
 	// if err := tracer.SetupTracer(); err != nil {
@@ -253,3 +264,12 @@ var index = `<!DOCTYPE html>
 <li><a href="/openapi.yaml">OpenAPI Yaml</a></li>
 <li><a href="/api/v1/docs/">OpenAPI Docs<a></li>
 </body></html>`
+
+func showVersion() {
+	for _, arg := range os.Args {
+		if arg == "--version" || arg == "-v" {
+			fmt.Println(version.String())
+			os.Exit(0)
+		}
+	}
+}
