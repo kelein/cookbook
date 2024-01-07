@@ -274,16 +274,16 @@ func grpcHandlerFunc(grpcServer *grpc.Server, httpServer http.Handler) http.Hand
 	return h2c.NewHandler(http.HandlerFunc(grpcFn), &http2.Server{})
 }
 
-var index = `<!DOCTYPE html>
-<html lang="en"><body>
-<h3>Govoyage</h3>
-<li><a href="/openapi.yaml">OpenAPI Yaml</a></li>
-<li><a href="/api/v1/docs/">OpenAPI Docs<a></li>
-</body></html>`
-
 func showVersion() {
 	if *v || *vs {
 		fmt.Println(version.String())
 		os.Exit(0)
 	}
 }
+
+var index = `<!DOCTYPE html>
+<html lang="en"><body>
+<h3>Govoyage</h3>
+<li><a href="/openapi.yaml">OpenAPI Yaml</a></li>
+<li><a href="/api/v1/docs/">OpenAPI Docs<a></li>
+</body></html>`
