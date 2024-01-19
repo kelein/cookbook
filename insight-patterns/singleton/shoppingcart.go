@@ -5,32 +5,40 @@ import (
 	"sync"
 )
 
-var (
-	once      sync.Once
-	intraCart *ShoppingCart
-)
+var once sync.Once
 
-// ShoppingCart for shopping
-type ShoppingCart struct {
-	products map[string]int
+var intraCartManager *ShoppingCartManager
+
+// ShoppingCartManager for shopping
+type ShoppingCartManager struct {
+	cart  map[string]int
+	keys  []string
+	mutex sync.Mutex
 }
 
-// GetShoppingCart return a global shopping cart
-func GetShoppingCart() *ShoppingCart {
+// GetShoppingCartManager return a global shopping cart
+func GetShoppingCartManager() *ShoppingCartManager {
 	once.Do(func() {
-		intraCart = &ShoppingCart{products: make(map[string]int)}
+		intraCartManager = &ShoppingCartManager{
+			cart: make(map[string]int),
+		}
 	})
-	return intraCart
+	return intraCartManager
 }
 
 // AddProduct adds a product into the shopping cart
-func (cart *ShoppingCart) AddProduct(name string, quantity int) {
-	cart.products[name] += quantity
+func (m *ShoppingCartManager) AddProduct(name string, quantity int) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	m.cart[name] += quantity
+	if _, ok := m.cart[name]; !ok {
+		m.keys = append(m.keys, name)
+	}
 }
 
 // ShowProduct show all products in the shopping cart
-func (cart *ShoppingCart) ShowProduct() {
-	for name, quantity := range cart.products {
-		slog.Info("product", "name", name, "quantity", quantity)
+func (m *ShoppingCartManager) ShowProduct() {
+	for _, item := range m.keys {
+		slog.Info("product", "name", item, "quantity", m.cart[item])
 	}
 }
