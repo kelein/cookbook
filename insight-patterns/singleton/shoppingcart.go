@@ -30,10 +30,10 @@ func GetShoppingCartManager() *ShoppingCartManager {
 func (m *ShoppingCartManager) AddProduct(name string, quantity int) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	m.cart[name] += quantity
 	if _, ok := m.cart[name]; !ok {
 		m.keys = append(m.keys, name)
 	}
+	m.cart[name] += quantity
 }
 
 // ShowProduct show all products in the shopping cart
