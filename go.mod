@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggest/swgui v1.8.0
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
-	go.etcd.io/etcd/client/v3 v3.5.11
+	go.etcd.io/etcd/client/v3 v3.5.12
 	go.etcd.io/etcd/server/v3 v3.5.11
 	go.opentelemetry.io/otel/trace v1.23.1
 	go.uber.org/zap v1.26.0
@@ -67,8 +67,8 @@ require (
 	github.com/vearutop/statigz v1.4.0 // indirect
 	github.com/xiang90/probing v0.0.0-20221125231312-a49e3df8f510 // indirect
 	go.etcd.io/bbolt v1.3.8 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.11 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.11 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.12 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.12 // indirect
 	go.etcd.io/etcd/client/v2 v2.305.11 // indirect
 	go.etcd.io/etcd/pkg/v3 v3.5.11 // indirect
 	go.etcd.io/etcd/raft/v3 v3.5.11 // indirect
