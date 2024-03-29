@@ -1,4 +1,6 @@
-package main
+package gogeneric
+
+import "cmp"
 
 // SumInts return the sum of map values
 func SumInts(m map[string]int64) int64 {
@@ -28,4 +30,15 @@ func SumNumber[K comparable, V Number](m map[string]V) V {
 		sum += e
 	}
 	return sum
+}
+
+// SliceMax return the maximum element of slice
+func SliceMax[T cmp.Ordered](s []T) T {
+	var v T
+	for _, item := range s {
+		if item > v {
+			v = item
+		}
+	}
+	return v
 }

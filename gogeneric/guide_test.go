@@ -1,6 +1,8 @@
-package main
+package gogeneric
 
 import (
+	"cmp"
+	"sort"
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v6"
@@ -93,6 +95,53 @@ func TestSumNumber(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := SumNumber[float64](tc.m)
 			t.Logf("SumNumber() = %v", got)
+		})
+	}
+}
+
+func TestSliceMax(t *testing.T) {
+	type testCase[V cmp.Ordered] struct {
+		name string
+		s    []V
+	}
+
+	intTests := []testCase[int]{
+		{"A", make([]int, 0)},
+		{"B", make([]int, 10)},
+		{"C", make([]int, 50)},
+		{"D", make([]int, 300)},
+		{"E", make([]int, 1000)},
+	}
+	for _, tt := range intTests {
+		t.Run(tt.name, func(t *testing.T) {
+			// * Filled slice with random values
+			gofakeit.Slice(&tt.s)
+			got := SliceMax(tt.s)
+			t.Logf("SliceMax() = %v", got)
+			sort.Slice(tt.s, func(i, j int) bool { return tt.s[i] > tt.s[j] })
+			if got != tt.s[0] {
+				t.Errorf("SliceMax() = %v, want %v", got, tt.s[0])
+			}
+		})
+	}
+
+	stringTests := []testCase[string]{
+		{"A", make([]string, 0)},
+		{"B", make([]string, 10)},
+		{"C", make([]string, 50)},
+		{"D", make([]string, 300)},
+		{"E", make([]string, 1000)},
+	}
+	for _, tt := range stringTests {
+		t.Run(tt.name, func(t *testing.T) {
+			// * Filled slice with random values
+			gofakeit.Slice(&tt.s)
+			got := SliceMax(tt.s)
+			t.Logf("SliceMax() = %v", got)
+			sort.Slice(tt.s, func(i, j int) bool { return tt.s[i] > tt.s[j] })
+			if got != tt.s[0] {
+				t.Errorf("SliceMax() = %v, want %v", got, tt.s[0])
+			}
 		})
 	}
 }
