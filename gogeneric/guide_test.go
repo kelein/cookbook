@@ -145,3 +145,15 @@ func TestSliceMax(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkAddInt(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		AddInt(i, i)
+	}
+}
+
+func BenchmarkAddNum(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		AddNum(i, i)
+	}
+}
