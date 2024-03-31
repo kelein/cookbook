@@ -48,8 +48,7 @@ func TestGenericQueue(t *testing.T) {
 				go func() {
 					defer wg.Done()
 					for range tt.entries {
-						q.Pop()
-						slog.Info("GenericQueue", "Peek", q.Peek(), "Size", q.Size())
+						slog.Info("GenericQueue", "Pop", q.Pop(), "Size", q.Size())
 					}
 				}()
 				wg.Wait()
@@ -73,8 +72,8 @@ func TestGenericQueue(t *testing.T) {
 				go func() {
 					defer wg.Done()
 					for range tt.entries {
-						q.Pop()
-						slog.Info("GenericQueue", "Peek", q.Peek(), "Size", q.Size())
+
+						slog.Info("GenericQueue", "Pop", q.Pop(), "Peek", q.Peek(), "Size", q.Size())
 					}
 				}()
 				wg.Wait()
