@@ -27,7 +27,9 @@ func TestAnyMatch(t *testing.T) {
 
 	stringTests := []testCase[string]{
 		{"C", []string{}, func(x string) bool { return len(x) >= 0 }, false},
-		{"D", []string{"2", "3", "7", "8"}, func(x string) bool { return strings.Contains(x, "a") }, false},
+		{"D", []string{"2", "3", "7", "8"}, func(x string) bool {
+			return strings.Contains(x, "a")
+		}, false},
 	}
 	for _, tt := range stringTests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -38,28 +40,28 @@ func TestAnyMatch(t *testing.T) {
 	}
 }
 
-/*
 func TestAllMatch(t *testing.T) {
-	type args struct {
+	type testCase[T any] struct {
+		name  string
 		datas []T
 		f     func(T) bool
+		want  bool
 	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
+
+	intTests := []testCase[int]{
+		{"A", []int{}, func(x int) bool { return x > 0 }, false},
+		{"B", []int{2, 3, 7, 8}, func(x int) bool { return x%3 == 0 }, false},
 	}
-	for _, tt := range tests {
+	for _, tt := range intTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := AllMatch(tt.args.datas, tt.args.f); got != tt.want {
+			if got := AllMatch(tt.datas, tt.f); got != tt.want {
 				t.Errorf("AllMatch() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
+/*
 func TestForEach(t *testing.T) {
 	type args struct {
 		datas []T

@@ -17,7 +17,7 @@ func AllMatch[T any](datas []T, f func(T) bool) bool {
 			return false
 		}
 	}
-	return true
+	return len(datas) > 0
 }
 
 // ForEach process each element by calling f
