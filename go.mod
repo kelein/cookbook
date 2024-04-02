@@ -1,6 +1,6 @@
 module github.com/kelein/cookbook
 
-go 1.22.0
+go 1.22.1
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0
