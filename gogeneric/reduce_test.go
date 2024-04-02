@@ -1,6 +1,8 @@
 package gogeneric
 
 import (
+	"log/slog"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -59,88 +61,73 @@ func TestAllMatch(t *testing.T) {
 			}
 		})
 	}
+
+	stringTests := []testCase[string]{
+		{"C", []string{}, func(x string) bool { return len(x) >= 0 }, false},
+		{"D", []string{"2", "3", "7", "8"}, func(x string) bool {
+			return strings.Contains(x, "a")
+		}, false},
+	}
+	for _, tt := range stringTests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AllMatch(tt.datas, tt.f); got != tt.want {
+				t.Errorf("AllMatch() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
-/*
 func TestForEach(t *testing.T) {
-	type args struct {
+	type testCase[T any] struct {
+		name  string
 		datas []T
 		f     func(T)
 	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
+
+	stringTests := []testCase[string]{
+		{"A", []string{}, func(x string) { slog.Info("ForEach", "item", x, "final", x+x) }},
+		{"B", []string{"a", "b"}, func(x string) { slog.Info("ForEach", "item", x, "final", x+x) }},
 	}
-	for _, tt := range tests {
+	for _, tt := range stringTests {
 		t.Run(tt.name, func(t *testing.T) {
-			ForEach(tt.args.datas, tt.args.f)
+			ForEach(tt.datas, tt.f)
 		})
 	}
 }
 
 func TestFilter(t *testing.T) {
-	type args struct {
+	type testCase[T any] struct {
+		name  string
 		datas []T
 		f     func(T) bool
+		want  []T
 	}
-	tests := []struct {
-		name string
-		args args
-		want []T
-	}{
-		// TODO: Add test cases.
+
+	stringTests := []testCase[string]{
+		{"A", []string{},
+			func(x string) bool { return len(x) > 0 }, []string{}},
+		{"B", []string{"", "xx", "golang"},
+			func(x string) bool { return len(x) > 2 }, []string{"golang"}},
 	}
-	for _, tt := range tests {
+	for _, tt := range stringTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Filter(tt.args.datas, tt.args.f); !reflect.DeepEqual(got, tt.want) {
+			if got := Filter(tt.datas, tt.f); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Filter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+
+	intTests := []testCase[int]{
+		{"C", []int{},
+			func(x int) bool { return x > 0 }, []int{}},
+		{"D", []int{123, 22, 14, 21},
+			func(x int) bool { return x%7 == 0 }, []int{14, 21}},
+	}
+	for _, tt := range intTests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Filter(tt.datas, tt.f); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Filter() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
-
-func TestMap(t *testing.T) {
-	type args struct {
-		datas []T
-		f     func(T) T
-	}
-	tests := []struct {
-		name string
-		args args
-		want []T
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := Map(tt.args.datas, tt.args.f); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Map() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestReduce(t *testing.T) {
-	type args struct {
-		datas  []T
-		result []T
-		f      func(T, []T) []T
-	}
-	tests := []struct {
-		name string
-		args args
-		want []T
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := Reduce(tt.args.datas, tt.args.result, tt.args.f); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Reduce() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-*/
