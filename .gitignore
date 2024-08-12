@@ -20,6 +20,11 @@
 *.so
 *.dylib
 
+# HashiCorp Terraform Auto Generated
+*.terraform
+*.tfstate
+*.tfstate.backup
+
 # Test binary, build with `go test -c`
 *.test
 devto-grpc/tests/*
