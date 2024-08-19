@@ -3,11 +3,11 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
 }
 
 resource "aws_instance" "example" {
-  ami                    = "ami-0c55b159cbfafe1f0"
+  ami                    = "ami-0ae8f15ae66fe8cda"
   instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.instance.id]
 
@@ -50,7 +50,7 @@ output "public_ip" {
 }
 
 resource "aws_launch_configuration" "example" {
-  image_id        = "ami-0c55b159cbfafe1f0"
+  image_id        = "ami-0ae8f15ae66fe8cda"
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.instance.id]
 
@@ -63,7 +63,7 @@ resource "aws_launch_configuration" "example" {
 
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
-  vpc_zone_identifier  = data.aws_subnet_ids.default.ids
+  vpc_zone_identifier  = data.aws_subnets.default.ids
 
   target_group_arns = [aws_lb_target_group.asg.arn]
 
@@ -89,20 +89,23 @@ data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnet_ids" "default" {
-  vpc_ids = data.aws_vpc.default.id
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
 }
 
 resource "aws_lb" "example" {
   name               = "value"
-  subnets            = data.aws_subnet_ids.default.ids
+  subnets            = data.aws_subnets.default.ids
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
 }
 
 resource "aws_lb_listener" "http" {
   port              = 80
-  protocol          = "НТТР"
+  protocol          = "HTTP"
   load_balancer_arn = aws_lb.example.arn
 
   default_action {
@@ -139,12 +142,12 @@ resource "aws_security_group" "alb" {
 resource "aws_lb_target_group" "asg" {
   name     = "terraform-asg-example"
   port     = var.server_port
-  protocol = "НТТР"
+  protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
 
   health_check {
     path                = "/"
-    protocol            = "НТТР"
+    protocol            = "HTTP"
     matcher             = "200"
     interval            = 15
     timeout             = 3
@@ -170,3 +173,16 @@ resource "aws_lb_listener_rule" "asg" {
     target_group_arn = aws_lb_target_group.asg.arn
   }
 }
+
+# terraform {
+#   backend "s3" {
+#     # 请用你的 bucket 名称替换
+#     bucket = "terraform-up-and-running-state"
+#     key    = "global/s3/terraform. tfstate"
+#     region = "us-east-1"
+
+#     # 请用你的 DynamoDB 表名称替换
+#     dynamodb_table = "terraform-up-and-running-locks"
+#     encrypt        = true
+#   }
+# }
