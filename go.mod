@@ -16,7 +16,7 @@ require (
 	github.com/prometheus/client_golang v1.20.4
 	github.com/samber/lo v1.47.0
 	github.com/stretchr/testify v1.9.0
-	github.com/swaggest/swgui v1.8.1
+	github.com/swaggest/swgui v1.8.2
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	go.etcd.io/etcd/client/v3 v3.5.16
 	go.etcd.io/etcd/server/v3 v3.5.16
