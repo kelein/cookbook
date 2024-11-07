@@ -15,6 +15,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/swaggest/swgui/v5emb"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/server/v3/proxy/grpcproxy"
@@ -189,6 +190,9 @@ func registerService(addr string) error {
 // runHTTPServer starts a http server via grpc-gateway
 func runHTTPServer() *http.ServeMux {
 	mux := http.NewServeMux()
+
+	// * Register metrics endpoint
+	mux.Handle("/metrics", promhttp.Handler())
 
 	// * Register index handler
 	mux.HandleFunc("/index", func(w http.ResponseWriter, r *http.Request) {
