@@ -1,7 +1,7 @@
 module github.com/kelein/cookbook
 
 go 1.22.1
-toolchain go1.24.0
+toolchain go1.24.1
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0
@@ -28,7 +28,7 @@ require (
 	golang.org/x/sync v0.12.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb
 	google.golang.org/grpc v1.71.0
-	google.golang.org/protobuf v1.36.5
+	google.golang.org/protobuf v1.36.6
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20211028080628-e2786a622600
 )
 
