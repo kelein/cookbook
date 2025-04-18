@@ -19,7 +19,7 @@ var (
 	Branch    string
 	BuildUser string
 	BuildDate string
-	AppName   = "Govoyage"
+	AppName   = "govoyage"
 	Uptime    = time.Now()
 	GoVersion = runtime.Version()
 	Platform  = runtime.GOOS + "/" + runtime.GOARCH
