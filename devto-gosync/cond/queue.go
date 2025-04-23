@@ -48,4 +48,8 @@ func (q *LimitQueue) Pop() any {
 }
 
 // Len return the length of current queue
-func (q *LimitQueue) Len() int { return q.store.Len() }
+func (q *LimitQueue) Len() int {
+	q.cond.L.Lock()
+	defer q.cond.L.Unlock()
+	return q.store.Len()
+}
