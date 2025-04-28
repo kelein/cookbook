@@ -15,7 +15,7 @@ require (
 	github.com/petermattis/goid v0.0.0-20250319124200-ccd6737f222a
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.22.0
-	github.com/samber/lo v1.49.1
+	github.com/samber/lo v1.50.0
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggest/swgui v1.8.3
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
