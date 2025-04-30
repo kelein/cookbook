@@ -43,7 +43,7 @@ func TestNewSecureMap(t *testing.T) {
 }
 
 func BenchmarkSecureMap(b *testing.B) {
-	for range b.N {
+	for b.Loop() {
 		sem := NewSecureMap()
 		wg := &sync.WaitGroup{}
 		for j := range 1000 {
