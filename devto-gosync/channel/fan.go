@@ -2,8 +2,8 @@ package channel
 
 import "sync"
 
-// fanOut distributes messages from a single input channel to multiple output channels.
-func fanOut(in <-chan any, out []chan<- any, async bool) {
+// fanout distributes messages from a single input channel to multiple output channels.
+func fanout(in <-chan any, out []chan<- any, async bool) {
 	go func() {
 		wg := sync.WaitGroup{}
 		defer func() {
