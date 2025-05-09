@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/concurrency"
@@ -66,6 +68,9 @@ func (em *ElectManager) Start() error {
 	defer session.Close()
 
 	election := concurrency.NewElection(session, em.electName)
+
+	go em.ping(election)
+
 	scaner := bufio.NewScanner(os.Stdin)
 	for scaner.Scan() {
 		cmd := scaner.Text()
@@ -90,7 +95,7 @@ func (em *ElectManager) Start() error {
 }
 
 func (em *ElectManager) value() string {
-	return fmt.Sprintf("value-%d-%d", em.nodeID, em.round)
+	return fmt.Sprintf("value-%d-%03d-%s", em.nodeID, em.round, time.Now().Format(time.RFC3339))
 }
 
 func (em *ElectManager) elect(election *concurrency.Election) error {
@@ -156,4 +161,23 @@ func (em *ElectManager) revision(election *concurrency.Election) error {
 	rev := election.Rev()
 	slog.Info("current leader", "revision", rev)
 	return nil
+}
+
+func (em *ElectManager) ping(election *concurrency.Election) {
+	tiker := time.NewTicker(time.Second * 30)
+	defer tiker.Stop()
+	for {
+		select {
+		case <-tiker.C:
+			res, err := election.Leader(context.Background())
+			if err != nil {
+				slog.Error("query leader failed", "error", err)
+				continue
+			}
+			value := string(res.Kvs[0].Value)
+			entry := strings.Split(value, "-")
+			isLeader := entry[1] == strconv.Itoa(em.nodeID)
+			slog.Info("current leader info", "key", res.Kvs[0].Key, "value", value, "isLeader", isLeader)
+		}
+	}
 }
