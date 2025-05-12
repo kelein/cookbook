@@ -95,7 +95,7 @@ func (em *ElectManager) Start() error {
 }
 
 func (em *ElectManager) value() string {
-	return fmt.Sprintf("value-%d-%03d-%s", em.nodeID, em.round, time.Now().Format(time.RFC3339))
+	return fmt.Sprintf("value-%d-%03d", em.nodeID, em.round)
 }
 
 func (em *ElectManager) elect(election *concurrency.Election) error {
