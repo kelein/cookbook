@@ -92,7 +92,7 @@ func doExchange(cli *clientv3.Client) {
 	for range accountNum {
 		eg.Go(func(ctx context.Context) error {
 			for range exchangeNum {
-				_, err := concurrency.NewSwTM(cli, exchange)
+				_, err := concurrency.NewSTM(cli, exchange)
 				if err != nil {
 					slog.Error("stm exchange failed", "error", err)
 					return err
