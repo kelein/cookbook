@@ -12,7 +12,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.6.7
 	github.com/jinzhu/copier v0.4.0
 	github.com/marusama/cyclicbarrier v1.1.0
-	github.com/olekukonko/tablewriter v1.0.2
+	github.com/olekukonko/tablewriter v1.0.4
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/petermattis/goid v0.0.0-20250319124200-ccd6737f222a
 	github.com/pkg/errors v0.9.1
