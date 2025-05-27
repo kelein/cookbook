@@ -152,8 +152,10 @@ func tableOutput(l *repo.Laptop) {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
+
 	// table.SetHeader([]string{"Brand", "Name", "Cores", "MinGHz", "RAM", "Price"})
-	table.SetHeader([]string{"Brand", "Name"})
+	// table.SetHeader([]string{"Brand", "Name"})
+
 	// table.SetAutoWrapText(false)
 	// table.SetAutoFormatHeaders(true)
 	// table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
@@ -169,7 +171,8 @@ func tableOutput(l *repo.Laptop) {
 	// table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
 	// table.SetCenterSeparator("|")
 
-	table.AppendBulk(data) // Add Bulk Data
+	// Add Bulk Data
+	table.Bulk(data)
 	table.Render()
 }
 
