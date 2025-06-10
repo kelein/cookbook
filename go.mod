@@ -24,7 +24,7 @@ require (
 	github.com/swaggest/swgui v1.8.4
 	github.com/uber/jaeger-client-go v2.30.0+incompatible
 	go.etcd.io/etcd/client/v3 v3.6.1
-	go.etcd.io/etcd/server/v3 v3.6.0
+	go.etcd.io/etcd/server/v3 v3.6.1
 	go.opentelemetry.io/otel/trace v1.36.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.39.0
@@ -76,7 +76,7 @@ require (
 	go.etcd.io/bbolt v1.4.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.6.1 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.6.1 // indirect
-	go.etcd.io/etcd/pkg/v3 v3.6.0 // indirect
+	go.etcd.io/etcd/pkg/v3 v3.6.1 // indirect
 	go.etcd.io/raft/v3 v3.6.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0 // indirect
