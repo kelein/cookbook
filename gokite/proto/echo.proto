@@ -4,8 +4,6 @@ package proto;
 
 option go_package = "service";
 
-// import "google/api/http.proto";
-
 import "google/api/annotations.proto";
 
 message Request {
