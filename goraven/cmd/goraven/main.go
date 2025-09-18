@@ -2,7 +2,11 @@ package main
 
 import (
 	"flag"
+	"io"
+	"log/slog"
 	"os"
+	"path/filepath"
+	"time"
 
 	"goraven/internal/conf"
 
@@ -13,6 +17,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
@@ -47,7 +52,38 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 
 func main() {
 	flag.Parse()
-	logger := log.With(log.NewStdLogger(os.Stdout),
+
+	logfile := &lumberjack.Logger{
+		Filename:   "logs/goraven.log",
+		MaxSize:    500,
+		MaxBackups: 5,
+		MaxAge:     7,
+		Compress:   true,
+	}
+	defer logfile.Close()
+
+	multiWriter := io.MultiWriter(os.Stdout, logfile)
+
+	replace := func(groups []string, a slog.Attr) slog.Attr {
+		if a.Key == slog.SourceKey {
+			source := a.Value.Any().(*slog.Source)
+			source.File = filepath.Base(source.File)
+		}
+		if a.Value.Kind() == slog.KindTime {
+			return slog.String(a.Key, a.Value.Time().Format(time.DateTime))
+		}
+		return a
+	}
+
+	opts := &slog.HandlerOptions{
+		AddSource:   true,
+		ReplaceAttr: replace,
+		Level:       slog.LevelDebug,
+	}
+	handler := slog.NewJSONHandler(multiWriter, opts)
+	slog.SetDefault(slog.New(handler))
+
+	logger := log.With(log.NewStdLogger(multiWriter),
 		"ts", log.DefaultTimestamp,
 		"caller", log.DefaultCaller,
 		"service.id", id,
@@ -56,6 +92,9 @@ func main() {
 		"trace.id", tracing.TraceID(),
 		"span.id", tracing.SpanID(),
 	)
+
+	logger = log.New
+
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
@@ -77,6 +116,8 @@ func main() {
 		panic(err)
 	}
 	defer cleanup()
+
+	slog.Info("server running...")
 
 	// start and wait for stop signal
 	if err := app.Run(); err != nil {
