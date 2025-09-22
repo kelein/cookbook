@@ -15,7 +15,7 @@ require (
 	github.com/jinzhu/copier v0.4.0
 	github.com/looplab/fsm v1.0.3
 	github.com/marusama/cyclicbarrier v1.1.0
-	github.com/olekukonko/tablewriter v1.0.9
+	github.com/olekukonko/tablewriter v1.1.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/petermattis/goid v0.0.0-20250904145737-900bdf8bb490
 	github.com/pkg/errors v0.9.1
