@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"goraven/internal/conf"
+	logus "goraven/pkg/logger"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -81,9 +82,13 @@ func main() {
 		Level:       slog.LevelDebug,
 	}
 	handler := slog.NewJSONHandler(multiWriter, opts)
-	slog.SetDefault(slog.New(handler))
+	// handler := slog.NewTextHandler(multiWriter, opts)
+	slogger := slog.New(handler)
+	slog.SetDefault(slogger)
 
-	logger := log.With(log.NewStdLogger(multiWriter),
+	klogger := logus.NewSlogger(slogger)
+
+	logger := log.With(klogger,
 		"ts", log.DefaultTimestamp,
 		"caller", log.DefaultCaller,
 		"service.id", id,
@@ -92,8 +97,6 @@ func main() {
 		"trace.id", tracing.TraceID(),
 		"span.id", tracing.SpanID(),
 	)
-
-	logger = log.New
 
 	c := config.New(
 		config.WithSource(
