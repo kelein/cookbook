@@ -81,8 +81,8 @@ func main() {
 		ReplaceAttr: replace,
 		Level:       slog.LevelDebug,
 	}
-	handler := slog.NewJSONHandler(multiWriter, opts)
-	// handler := slog.NewTextHandler(multiWriter, opts)
+	// handler := slog.NewJSONHandler(multiWriter, opts)
+	handler := slog.NewTextHandler(multiWriter, opts)
 	slogger := slog.New(handler)
 	slog.SetDefault(slogger)
 
