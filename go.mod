@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0
-	github.com/cloudwego/kitex v0.14.1
+	github.com/cloudwego/kitex v0.15.1
 	github.com/cloudwego/prutal v0.1.3
 	github.com/fatih/color v1.18.0
 	github.com/go-kratos/kratos v1.0.1
@@ -54,11 +54,11 @@ require (
 	github.com/cloudwego/dynamicgo v0.7.0 // indirect
 	github.com/cloudwego/fastpb v0.0.5 // indirect
 	github.com/cloudwego/frugal v0.3.0 // indirect
-	github.com/cloudwego/gopkg v0.1.5 // indirect
+	github.com/cloudwego/gopkg v0.1.6 // indirect
 	github.com/cloudwego/localsession v0.1.2 // indirect
-	github.com/cloudwego/netpoll v0.7.1 // indirect
+	github.com/cloudwego/netpoll v0.7.2 // indirect
 	github.com/cloudwego/runtimex v0.1.1 // indirect
-	github.com/cloudwego/thriftgo v0.4.2 // indirect
+	github.com/cloudwego/thriftgo v0.4.3 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.6.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
