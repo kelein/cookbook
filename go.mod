@@ -27,7 +27,7 @@ require (
 	go.etcd.io/etcd/client/v3 v3.6.5
 	go.etcd.io/etcd/server/v3 v3.6.5
 	go.opentelemetry.io/otel/trace v1.38.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.43.0
 	golang.org/x/net v0.46.0
 	golang.org/x/sync v0.18.0
