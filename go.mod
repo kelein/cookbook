@@ -32,7 +32,7 @@ require (
 	golang.org/x/net v0.46.0
 	golang.org/x/sync v0.18.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250929231259-57b25ae835d4
-	google.golang.org/protobuf v1.36.10
+	google.golang.org/protobuf v1.36.11
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20211028080628-e2786a622600
 )
 
