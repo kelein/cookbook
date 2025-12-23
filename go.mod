@@ -28,8 +28,8 @@ require (
 	go.etcd.io/etcd/server/v3 v3.6.7
 	go.opentelemetry.io/otel/trace v1.38.0
 	go.uber.org/zap v1.27.1
-	golang.org/x/crypto v0.43.0
-	golang.org/x/net v0.46.0
+	golang.org/x/crypto v0.46.0
+	golang.org/x/net v0.47.0
 	golang.org/x/sync v0.19.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250929231259-57b25ae835d4
 	google.golang.org/protobuf v1.36.11
