@@ -38,7 +38,7 @@ require (
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
-	google.golang.org/grpc v1.76.0
+	google.golang.org/grpc v1.77.0
 )
 
 require (
@@ -112,7 +112,7 @@ require (
 	go.etcd.io/etcd/client/pkg/v3 v3.6.7 // indirect
 	go.etcd.io/etcd/pkg/v3 v3.6.7 // indirect
 	go.etcd.io/raft/v3 v3.6.0 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.63.0 // indirect
 	go.opentelemetry.io/otel v1.38.0 // indirect
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
@@ -124,7 +124,7 @@ require (
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/time v0.13.0 // indirect
 	golang.org/x/tools/godoc v0.1.0-deprecated // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
 	sourcegraph.com/sourcegraph/appdash-data v0.0.0-20151005221446-73f23eafcf67 // indirect
