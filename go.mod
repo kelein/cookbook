@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0
-	github.com/cloudwego/kitex v0.16.0
+	github.com/cloudwego/kitex v0.16.1
 	github.com/cloudwego/prutal v0.1.3
 	github.com/fatih/color v1.18.0
 	github.com/go-kratos/kratos v1.0.1
