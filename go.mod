@@ -30,7 +30,7 @@ require (
 	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.48.0
 	golang.org/x/net v0.49.0
-	golang.org/x/sync v0.19.0
+	golang.org/x/sync v0.20.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260209200024-4cfbd4190f57
 	google.golang.org/protobuf v1.36.11
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20211028080628-e2786a622600
